@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>성지넷 게시판</title>
+
+  <!-- 기존 메인 스타일 재사용 -->
+  <link rel="stylesheet" href="css/style-main.css" />
+  <style>
+    /* 게시판 전용 가벼운 스타일 (원하면 나중에 style-main.css로 옮겨도 됨) */
+    .board-wrapper {
+      max-width: 960px;
+      margin: 80px auto 120px;
+      padding: 0 16px;
+    }
+    .board-header {
+      margin-bottom: 24px;
+    }
+    .board-header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+    .board-header p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+    .board-form {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      margin-bottom: 24px;
+    }
+    .board-form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .board-form-row input[type="text"] {
+      flex: 1;
+    }
+    .board-form label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .board-form input[type="text"],
+    .board-form textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #d4d4d8;
+      padding: 8px 10px;
+      font-size: 0.95rem;
+    }
+    .board-form textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .board-submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+    .board-submit-row button {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .board-submit-row button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+    .rating-row input {
+      margin-left: 4px;
+      margin-right: 2px;
+    }
+    .board-list {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px 0;
+    }
+    .board-empty {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    .board-post {
+      padding: 14px 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .board-post:first-child {
+      border-top: none;
+    }
+    .board-post-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+    .board-post-meta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+    .board-post-content {
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      color: #374151;
+    }
+    .board-rating {
+      font-size: 0.85rem;
+      color: #f97316;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="board-wrapper">
+    <header class="board-header">
+      <h1 id="board-title">게시판</h1>
+      <p id="board-description"></p>
+    </header>
+
+    <section class="board-form" aria-label="글 작성">
+      <form id="post-form">
+        <div class="board-form-row">
+          <div style="flex: 0 0 140px;">
+            <label for="nickname-input">닉네임</label>
+            <input
+              type="text"
+              id="nickname-input"
+              placeholder="이름 또는 별명"
+              maxlength="20"
+              required
+            />
+          </div>
+          <div style="flex: 1;">
+            <label for="title-input">제목</label>
+            <input
+              type="text"
+              id="title-input"
+              placeholder="제목을 입력하세요"
+              maxlength="50"
+              required
+            />
+          </div>
+        </div>
+
+        <label for="content-input">내용</label>
+        <textarea
+          id="content-input"
+          placeholder="내용을 입력하세요"
+          maxlength="1000"
+          required
+        ></textarea>
+
+        <!-- 후기게시판에서만 보이는 별점 영역 -->
+        <div class="rating-row" id="rating-row" style="display:none;">
+          <span>별점:</span>
+          <label><input type="radio" name="rating" value="5" />★5</label>
+          <label><input type="radio" name="rating" value="4" />★4</label>
+          <label><input type="radio" name="rating" value="3" />★3</label>
+        </div>
+
+        <div class="board-submit-row">
+          <button type="submit" id="submit-button">등록하기</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="board-list" aria-label="게시글 목록">
+      <div id="post-list" class="board-empty">작성된 글이 없습니다.</div>
+    </section>
+  </div>
+
+  <!-- 게시판 공용 스크립트 -->
+  <script type="module" src="js/board.js"></script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --bg-color: #f4f7fc;
+    --text-dark: #111;
+    --text-gray: #666;
+    --white: #ffffff;
+    --shadow: 0 4px 20px rgba(0,0,0,0.06);
+    --kakao-yellow: #FEE500;
+    --kakao-text: #3C1E1E;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    padding-bottom: 100px; /* 푸터 공간 확보 */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* [섹션 1] 신뢰도 헤더 */
+.trust-header {
+    background: var(--white);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.stats-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.stat-item { display: flex; flex-direction: column; }
+.stat-label { color: #888; font-size: 10px; margin-bottom: 1px; }
+.stat-value { font-weight: 800; font-size: 14px; color: var(--text-dark); }
+.stat-value.star { color: #ffc107; }
+.stat-sub { font-size: 10px; color: #999; font-weight: 400; }
+.stat-divider { color: #e0e0e0; font-size: 16px; font-weight: 100; }
+
+.manager-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 5px 12px 5px 5px;
+    border-radius: 30px;
+    border: 1px solid #eee;
+}
+
+.manager-img-box { 
+    position: relative; 
+    width: 38px; 
+    height: 38px; 
+    flex-shrink: 0;
+}
+
+.manager-img-box img { 
+    width: 100%; 
+    height: 100%; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.team-badge {
+    position: absolute; 
+    top: -4px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    background: #333; 
+    color: white;
+    font-size: 8px; 
+    padding: 1px 5px; 
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 1;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.manager-info { 
+    display: flex; 
+    flex-direction: column; 
+    line-height: 1.2; 
+    justify-content: center;
+}
+
+.manager-name { font-weight: 800; font-size: 13px; color: #333; }
+.manager-role { font-size: 9px; color: #888; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+
+.quote-date-bar {
+    background: #f1f3f5;
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* [섹션 2] AI 결과 카드 */
+.quote-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+
+.ai-result-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 30px 25px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 1px solid rgba(0,123,255,0.08);
+}
+
+.ai-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--primary-color), #00d2ff);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,123,255,0.2);
+}
+
+.greeting { font-size: 22px; font-weight: 800; margin: 0 0 25px 0; line-height: 1.35; letter-spacing: -0.5px; }
+.greeting span { color: var(--primary-color); }
+
+.plan-summary { background: #f9fafb; border-radius: 16px; padding: 20px; border: 1px solid #f1f3f5; }
+
+.plan-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; }
+.plan-row .label { color: #888; font-weight: 500; flex-shrink: 0; width: 80px; }
+
+/* [수정] 통신사 텍스트 스타일 강화 */
+.plan-row .value { font-weight: 700; color: #333; text-align: right; word-break: keep-all; }
+.plan-row .value.highlight { 
+    color: var(--primary-color); 
+    font-size: 18px; 
+    font-weight: 900;
+    background-color: rgba(0,123,255,0.08);
+    padding: 4px 12px;
+    border-radius: 8px;
+    letter-spacing: -0.5px;
+}
+
+.product-value-box { text-align: right; flex-grow: 1; }
+#plan-product { display: block; font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #111; }
+
+.divider { height: 1px; background: #e9ecef; margin: 15px 0; }
+
+.price-row { align-items: flex-end; margin-bottom: 0; }
+.price-box { text-align: right; }
+.original-price { display: block; text-decoration: line-through; color: #aaa; font-size: 13px; margin-bottom: 2px; }
+.final-price { font-size: 26px; font-weight: 900; color: #d63384; line-height: 1; letter-spacing: -1px; }
+
+.saving-badge {
+    margin-top: 20px;
+    background: #fff0f6;
+    color: #d63384;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 2px 5px rgba(214, 51, 132, 0.1);
+}
+
+/* [섹션 3] 혜택 섹션 */
+.section-title { font-size: 17px; font-weight: 800; margin-bottom: 15px; color: #333; display: flex; align-items: center; gap: 6px; }
+
+.benefit-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    border: 1px solid #f1f3f5;
+}
+
+.benefit-icon { font-size: 28px; }
+.benefit-info { display: flex; flex-direction: column; flex-grow: 1; }
+.benefit-name { font-size: 13px; color: #666; margin-bottom: 2px; }
+.benefit-amount { font-size: 22px; font-weight: 900; color: #111; letter-spacing: -0.5px; }
+.benefit-amount.highlight { color: var(--primary-color); }
+
+.benefit-card.secret {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px dashed #cce5ff;
+    background: #f8fbff;
+}
+
+.benefit-content-blur {
+    filter: blur(6px);
+    transition: filter 0.5s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.secret-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    background: rgba(255,255,255,0.7);
+    color: var(--primary-dark);
+    font-weight: 800;
+    font-size: 14px;
+    transition: opacity 0.3s ease;
+}
+.secret-overlay i { font-size: 24px; margin-bottom: 8px; color: var(--primary-color); }
+
+.benefit-card.secret.unlocked { border-style: solid; border-color: var(--primary-color); background: #fff; }
+.benefit-card.secret.unlocked .benefit-content-blur { filter: blur(0); }
+.benefit-card.secret.unlocked .secret-overlay { opacity: 0; pointer-events: none; }
+.secret-desc { font-size: 11px; color: #888; margin-top: 5px; display: none; }
+.benefit-card.secret.unlocked .secret-desc { display: block; animation: fadeIn 0.5s; }
+
+/* [섹션 4] 필수 안내사항 */
+.notice-section {
+    margin-top: 35px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #eee;
+}
+.notice-section h3 { font-size: 15px; font-weight: 800; margin: 0 0 12px 0; display: flex; align-items: center; color: #333; }
+.notice-section h3 .bar { color: var(--primary-color); margin-right: 8px; font-weight: 900; font-size: 18px; }
+.notice-list { padding-left: 18px; margin: 0; font-size: 13px; color: #666; line-height: 1.7; }
+.notice-list li { margin-bottom: 6px; }
+
+/* [섹션 5] 플로팅 푸터 (수정됨) */
+.floating-footer {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: var(--white);
+    padding: 12px 15px 25px; /* 하단 여백 확보 (아이폰 홈바 대응) */
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr; /* 버튼 비율 조정 */
+    gap: 8px;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.btn-footer {
+    display: flex; justify-content: center; align-items: center; gap: 6px;
+    border: none; border-radius: 10px; font-weight: 700; font-size: 14px;
+    text-decoration: none; cursor: pointer; height: 50px;
+    transition: transform 0.1s;
+}
+.btn-footer:active { transform: scale(0.98); }
+
+/* 카톡 버튼 */
+.btn-kakao {
+    background: var(--kakao-yellow);
+    color: var(--kakao-text);
+}
+
+/* 전화 버튼 */
+.btn-call {
+    background: #f1f3f5;
+    color: #333;
+    border: 1px solid #e9ecef;
+}
+
+/* 가입하기 버튼 */
+.btn-apply {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    font-size: 15px;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.25);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 반응형 미디어 쿼리 */
+@media (max-width: 360px) {
+    .floating-footer { padding: 10px; }
+    .btn-footer { font-size: 13px; gap: 4px; }
+    .plan-row .value.highlight { font-size: 16px; }
+    .final-price { font-size: 22px; }
+}

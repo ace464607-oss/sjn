@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성지넷 통합 관리자</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+    <link rel="stylesheet" href="css/admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* [신규] 고급스러운 상품 설정 UI */
+        .policy-group {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f1f3f5;
+        }
+        .section-header h3 { margin: 0; font-size: 18px; color: #343a40; font-weight: 800; }
+        
+        /* 상품 카드 스타일 */
+        .dynamic-row {
+            display: flex; align-items: center; gap: 12px;
+            background: #f8f9fa; padding: 15px; border-radius: 12px;
+            margin-bottom: 12px; border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .dynamic-row:hover { border-color: #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .dynamic-row.modified { background: #fff9db; border-color: #ffec99; } /* 수정 중일 때 */
+        .dynamic-row.confirmed { background: #d3f9d8; border-color: #b2f2bb; } /* 확인 완료 시 */
+
+        .input-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .input-label { font-size: 11px; color: #868e96; font-weight: 600; margin-left: 2px; }
+        
+        .dynamic-row input {
+            border: 1px solid #ced4da; border-radius: 8px; padding: 10px 12px;
+            font-size: 14px; width: 100%; transition: border-color 0.2s;
+        }
+        .dynamic-row input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+        .dynamic-row input.price-input { text-align: right; font-weight: 700; color: #495057; }
+
+        /* 버튼 스타일 */
+        .btn-row-action {
+            width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; font-size: 16px;
+            transition: all 0.2s;
+        }
+        .btn-confirm-item { background: #e9ecef; color: #adb5bd; pointer-events: none; }
+        .btn-confirm-item.active { background: #007bff; color: white; pointer-events: auto; box-shadow: 0 4px 10px rgba(0,123,255,0.3); }
+        .btn-confirm-item.active:hover { background: #0056b3; transform: translateY(-2px); }
+        
+        .btn-remove-item { background: #ffe3e3; color: #fa5252; }
+        .btn-remove-item:hover { background: #ffc9c9; color: #c92a2a; }
+
+        .btn-add-item {
+            background: #e7f5ff; color: #007bff; border: 1px dashed #007bff;
+            padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-add-item:hover { background: #007bff; color: white; }
+
+        /* 상담사 수정 버튼 */
+        .btn-edit { background-color: #ffc107; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        .btn-edit:hover { background-color: #e0a800; }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h2>🔒 관리자 로그인</h2>
+        <input type="password" id="password-input" placeholder="비밀번호 입력">
+        <button id="login-button">로그인</button>
+        <p id="login-message"></p>
+    </div>
+
+    <div class="admin-container" id="admin-container" style="display: none;">
+        <div class="admin-header">
+            <h1>📊 성지넷 통합 관리자</h1>
+            <div class="header-actions">
+                <a href="index.html" target="_blank" class="btn-link"><i class="fas fa-home"></i> 홈으로</a>
+                <!-- [신규] 매니저 CRM 이동 버튼 -->
+                <a href="manager-crm.html" target="_blank" class="btn-link highlight" style="background:#4F46E5; color:white; border:none;"><i class="fas fa-user-tie"></i> 매니저 CRM</a>
+                <a href="manager-link.html" target="_blank" class="btn-link highlight"><i class="fas fa-link"></i> 링크 생성기</a>
+            </div>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-target="tab-telecom">📡 통신사/요금 설정</button>
+            <button class="tab-btn" data-target="tab-manager">👩‍💼 상담사 프로필 관리</button>
+        </div>
+
+        <!-- [탭 1] 통신사/요금 설정 -->
+        <div id="tab-telecom" class="tab-content active">
+            <div class="section" id="dashboard-section">
+                <h2>📈 대시보드</h2>
+                <div id="dashboard-content" class="form-grid">
+                    <p>데이터를 불러오는 중입니다...</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>1. 통신사 선택</h2>
+                <div class="telecom-selector" id="telecom-selector">
+                    <!-- JS 동적 생성 -->
+                </div>
+            </div>
+
+            <form id="admin-form">
+                <div class="section" id="price-section">
+                    <h2>2. 요금 및 상품 설정 (단위: 원)</h2>
+                    <p class="description">
+                        상품 내용을 수정하면 <strong>[확인]</strong> 버튼이 활성화됩니다.<br>
+                        각 항목의 <strong>[확인]</strong>을 눌러 임시 저장 후, 하단의 <strong>[전체 설정 저장하기]</strong>를 눌러야 최종 반영됩니다.
+                    </p>
+                    
+                    <!-- 인터넷 상품 -->
+                    <div class="policy-group">
+                        <div class="section-header">
+                            <h3>🌐 인터넷 상품</h3>
+                            <button type="button" class="btn-add-item" onclick="addRateItem('internet')">+ 상품 추가</button>
+                        </div>
+                        <div id="internet-list-container"></div>
+                    </div>
+
+                    <!-- TV 상품 -->
+                    <div class="policy-group">
+                        <div class="section-header">
+                            <h3>📺 TV 상품</h3>
+                            <button type="button" class="btn-add-item" onclick="addRateItem('tv')">+ 상품 추가</button>
+                        </div>
+                        <div id="tv-list-container"></div>
+                    </div>
+
+                    <!-- 셋탑박스 상품 -->
+                    <div class="policy-group">
+                        <div class="section-header">
+                            <h3>📡 셋탑박스</h3>
+                            <button type="button" class="btn-add-item" onclick="addRateItem('settop')">+ 상품 추가</button>
+                        </div>
+                        <div id="settop-list-container"></div>
+                    </div>
+
+                    <!-- 추가 TV 상품 -->
+                    <div class="policy-group">
+                        <div class="section-header">
+                            <h3>➕ TV 추가 설치</h3>
+                            <button type="button" class="btn-add-item" onclick="addRateItem('additionalTv')">+ 상품 추가</button>
+                        </div>
+                        <div id="additionalTv-list-container"></div>
+                    </div>
+                </div>
+                
+                <div class="section" id="gift-policy-section">
+                    <h2>3. 사은품 정책 설정 (단위: 만원)</h2>
+                    <div id="gift-policy-form-grid"></div>
+                </div>
+
+                <div class="section" id="log-section">
+                    <h2>📜 최근 변경 이력 (최신 10개)</h2>
+                    <div id="log-content" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; border-radius: 8px; background-color: #f8f9fa;"></div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn-save">전체 설정 저장하기</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- [탭 2] 상담사 프로필 관리 -->
+        <div id="tab-manager" class="tab-content">
+            <div class="section">
+                <h2 id="manager-form-title">👩‍💼 상담사 등록</h2>
+                <form id="manager-form">
+                    <input type="hidden" id="m-id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>이름</label>
+                            <input type="text" id="m-name" placeholder="예: 홍연주" required>
+                        </div>
+                        <div class="form-group">
+                            <label>연락처</label>
+                            <input type="text" id="m-phone" placeholder="예: 010-1234-5678" required>
+                        </div>
+                        <div class="form-group">
+                            <label>팀명 (배지)</label>
+                            <input type="text" id="m-team" placeholder="예: 솔루션제안팀" value="솔루션제안팀">
+                        </div>
+                        <div class="form-group">
+                            <label>직책</label>
+                            <input type="text" id="m-role" placeholder="예: MANAGER" value="MANAGER">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>카카오톡 링크 (오픈채팅 또는 채널 URL)</label>
+                            <input type="text" id="m-kakao" placeholder="예: http://pf.kakao.com/_xxxx/chat">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>프로필 이미지 경로 (파일명 또는 URL)</label>
+                            <input type="text" id="m-img" placeholder="예: assets/images/manager_placeholder.png" value="assets/images/manager_placeholder.png">
+                        </div>
+                    </div>
+                    <div class="actions" style="margin-top: 20px;">
+                        <button type="button" id="btn-cancel-edit" class="btn-link" style="display:none; margin-right:10px;">취소</button>
+                        <button type="submit" id="btn-save-manager" class="btn-save" style="background-color: #28a745;">상담사 저장하기</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>📋 등록된 상담사 목록</h2>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>사진</th>
+                                <th>이름</th>
+                                <th>팀/직책</th>
+                                <th>연락처</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manager-list">
+                            <!-- JS로 목록 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>

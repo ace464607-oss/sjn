@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통신사 데이터 업데이트 (TV 2대 추가)</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; text-align: center; }
+        button { padding: 15px 30px; font-size: 18px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #status { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>📡 통신사 데이터 업데이트</h1>
+    <p>모든 통신사에 'TV 2대 추가' 항목을 반영하고 데이터를 초기화합니다.</p>
+    <button id="btn-seed">데이터 업데이트하기</button>
+    <div id="status"></div>
+
+    <script type="module">
+        import { saveData } from './js/data-service.js';
+
+        const initialData = {
+            "SK": {
+                "name": "SK", "color": "#ED1C24",
+                "internet": [ { "id": "sk_100", "name": "100M 광랜", "price": 22000 }, { "id": "sk_500", "name": "500M 기가라이트", "price": 33000 }, { "id": "sk_1000", "name": "1G 기가인터넷", "price": 38500 } ],
+                "tv": [ { "id": "sk_tv_basic", "name": "이코노미 (184채널)", "price": 9900 }, { "id": "sk_tv_std", "name": "스탠다드 (223채널)", "price": 13200 }, { "id": "sk_tv_all", "name": "All (253채널)", "price": 16500 } ],
+                "settop": [ { "id": "sk_st_smart3", "name": "Smart3 셋탑", "price": 4400 }, { "id": "sk_st_apple", "name": "Apple TV", "price": 6600 } ],
+                "additionalTv": [ 
+                    { "id": "sk_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "sk_add_1", "name": "TV 1대 추가", "price": 9900 },
+                    { "id": "sk_add_2", "name": "TV 2대 추가", "price": 19800 }
+                ],
+                "giftPolicy": { "base_100": 100000, "base_500": 150000, "base_1000": 200000, "tv_bundle_add_500": 470000 }
+            },
+            "KT": {
+                "name": "KT", "color": "#000000",
+                "internet": [ { "id": "kt_100", "name": "100M 광랜", "price": 22000 }, { "id": "kt_500", "name": "500M 베이직", "price": 33000 }, { "id": "kt_1000", "name": "1G 에센스", "price": 38500 } ],
+                "tv": [ { "id": "kt_tv_basic", "name": "베이직 (230채널)", "price": 12100 }, { "id": "kt_tv_lite", "name": "라이트 (235채널)", "price": 13200 }, { "id": "kt_tv_essence", "name": "에센스 (260채널)", "price": 16500 } ],
+                "settop": [ { "id": "kt_st_uhd4", "name": "UHD4 셋탑", "price": 4400 }, { "id": "kt_st_giga", "name": "기가지니A", "price": 3300 } ],
+                "additionalTv": [ 
+                    { "id": "kt_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "kt_add_1", "name": "TV 1대 추가", "price": 9900 },
+                    { "id": "kt_add_2", "name": "TV 2대 추가", "price": 19800 }
+                ],
+                "giftPolicy": { "base_100": 90000, "base_500": 140000, "base_1000": 180000, "tv_bundle_add_500": 450000 }
+            },
+            "LG": {
+                "name": "LG U+", "color": "#D20268",
+                "internet": [ { "id": "lg_100", "name": "100M 광랜안심", "price": 22000 }, { "id": "lg_500", "name": "500M 기가안심", "price": 33000 }, { "id": "lg_1000", "name": "1G 기가안심", "price": 38500 } ],
+                "tv": [ { "id": "lg_tv_general", "name": "일반형 (190채널)", "price": 10890 }, { "id": "lg_tv_premium", "name": "프리미엄 (254채널)", "price": 16500 }, { "id": "lg_tv_prime", "name": "프라임라이트 (259채널)", "price": 18700 } ],
+                "settop": [ { "id": "lg_st_uhd4", "name": "UHD4 셋탑", "price": 4400 }, { "id": "lg_st_sound", "name": "사운드바", "price": 6600 } ],
+                "additionalTv": [ 
+                    { "id": "lg_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "lg_add_1", "name": "TV 1대 추가", "price": 9900 },
+                    { "id": "lg_add_2", "name": "TV 2대 추가", "price": 19800 }
+                ],
+                "giftPolicy": { "base_100": 300000, "base_500": 400000, "base_1000": 470000, "tv_bundle_add_500": 470000 }
+            },
+            "SKB": {
+                "name": "B알뜰", "color": "#002266",
+                "internet": [ { "id": "skb_100", "name": "100M 광랜", "price": 16500 }, { "id": "skb_500", "name": "500M 기가라이트", "price": 23100 }, { "id": "skb_1000", "name": "1G 기가인터넷", "price": 25300 } ],
+                "tv": [ { "id": "skb_tv_pop100", "name": "B tv pop 100", "price": 8800 }, { "id": "skb_tv_pop180", "name": "B tv pop 180", "price": 11000 }, { "id": "skb_tv_pop230", "name": "B tv pop 230", "price": 13200 } ],
+                "settop": [ { "id": "skb_st_smart3", "name": "Smart3 셋탑", "price": 4400 } ],
+                "additionalTv": [ 
+                    { "id": "skb_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "skb_add_1", "name": "TV 1대 추가", "price": 6600 },
+                    { "id": "skb_add_2", "name": "TV 2대 추가", "price": 13200 }
+                ],
+                "giftPolicy": { "base_100": 100000, "base_500": 450000 }
+            },
+            "Skylife": {
+                "name": "Skylife", "color": "#ED1C24",
+                "internet": [ { "id": "sky_100", "name": "100M 홈결합", "price": 19800 }, { "id": "sky_200", "name": "200M 홈결합", "price": 22000 }, { "id": "sky_500", "name": "500M 홈결합", "price": 28600 }, { "id": "sky_1000", "name": "1G 홈결합", "price": 33000 } ],
+                "tv": [ { "id": "sky_tv_all", "name": "sky All (239채널)", "price": 11000 }, { "id": "sky_tv_point", "name": "sky Point (204채널)", "price": 8800 } ],
+                "settop": [ { "id": "sky_st_uhd", "name": "UHD 셋탑", "price": 1100 } ],
+                "additionalTv": [ 
+                    { "id": "sky_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "sky_add_1", "name": "TV 1대 추가", "price": 7700 },
+                    { "id": "sky_add_2", "name": "TV 2대 추가", "price": 15400 }
+                ],
+                "giftPolicy": { "base_100": 200000, "base_500": 350000 }
+            },
+            "HelloVision": {
+                "name": "HelloVision", "color": "#6A0DAD",
+                "internet": [ { "id": "hello_100", "name": "100M 광랜", "price": 18000 }, { "id": "hello_500", "name": "500M 기가", "price": 25000 }, { "id": "hello_1000", "name": "1G 기가", "price": 29000 } ],
+                "tv": [ { "id": "hello_tv_basic", "name": "뉴베이직", "price": 11000 }, { "id": "hello_tv_prem", "name": "뉴프리미엄", "price": 13000 } ],
+                "settop": [ { "id": "hello_st_uhd", "name": "UHD 셋탑", "price": 3300 } ],
+                "additionalTv": [ 
+                    { "id": "hello_add_none", "name": "선택 안함", "price": 0 }, 
+                    { "id": "hello_add_1", "name": "TV 1대 추가", "price": 8800 },
+                    { "id": "hello_add_2", "name": "TV 2대 추가", "price": 17600 }
+                ],
+                "giftPolicy": { "base_100": 150000, "base_500": 400000 }
+            }
+        };
+
+        document.getElementById('btn-seed').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-seed');
+            const status = document.getElementById('status');
+            btn.disabled = true;
+            btn.textContent = "업데이트 중...";
+
+            const success = await saveData(initialData);
+
+            if (success) {
+                status.style.color = "green";
+                status.innerHTML = "✅ 데이터 업데이트 성공!<br>이제 메인 페이지(index.html)와 관리자 페이지(admin.html)를 새로고침 하세요.";
+                btn.textContent = "완료됨";
+            } else {
+                status.style.color = "red";
+                status.textContent = "❌ 실패. Firebase 규칙을 확인하세요.";
+                btn.disabled = false;
+                btn.textContent = "다시 시도";
+            }
+        });
+    </script>
+</body>
+</html>

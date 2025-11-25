@@ -1,0 +1,187 @@
+/* css/admin-style.css */
+:root {
+    --primary-color: #007bff; --primary-dark: #0056b3; --border-color: #dee2e6;
+    --white-color: #ffffff; --text-color: #333; --light-bg: #f8f9fa;
+    --danger-color: #dc3545; --success-color: #28a745;
+}
+body { 
+    font-family: sans-serif; 
+    background-color: var(--light-bg); 
+    color: var(--text-color); 
+    /* [수정] 로그인 화면을 중앙 정렬하기 위한 기본 스타일 */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    margin: 0;
+}
+
+/* [추가] 로그인 성공 시 body 스타일을 되돌려 레이아웃 깨짐 방지 */
+body.logged-in {
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+}
+
+#login-container { text-align: center; background: var(--white-color); padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+#login-container h2 { margin-bottom: 20px; }
+#login-container input { font-size: 1em; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px; width: 250px; }
+#login-container button { font-size: 1em; padding: 10px 20px; border: none; background: var(--primary-color); color: white; border-radius: 6px; cursor: pointer; }
+#login-message { margin-top: 15px; color: var(--danger-color); font-weight: bold; min-height: 1.2em; } /* 메시지 영역 확보 */
+.admin-container { padding: 20px; max-width: 900px; margin: 40px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-radius: 12px; background-color: var(--white-color); }
+h1 { color: var(--primary-dark); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px; }
+.section { margin-bottom: 30px; }
+h2 { font-size: 1.2em; margin-bottom: 15px; color: var(--text-color); }
+.telecom-selector { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; flex-wrap: wrap; }
+.telecom-selector button { padding: 10px 15px; border: 1px solid var(--border-color); background-color: var(--white-color); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+.telecom-selector button.active { background-color: var(--primary-color); color: var(--white-color); border-color: var(--primary-color); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-weight: 600; margin-bottom: 8px; font-size: 0.9em; }
+.form-group input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1em; }
+.actions { margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end; }
+.actions button, .actions a { padding: 12px 25px; border-radius: 8px; font-size: 1em; font-weight: 700; cursor: pointer; text-decoration: none; }
+.btn-save { background-color: var(--primary-color); color: var(--white-color); border: none; }
+.btn-link { background-color: #6c757d; color: var(--white-color); border: none; display: inline-flex; align-items: center; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1000; }
+.toast.show { opacity: 1; visibility: visible; } /* [수정] show 클래스에 visibility 추가 */
+.toast.show.success { background-color: var(--success-color); }
+.toast.show.error { background-color: var(--danger-color); }
+
+/* admin-style.css 파일 맨 아래에 추가 */
+
+.section p.description {
+    font-size: 0.9em;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+/* admin-style.css 파일 맨 아래에 추가 */
+
+/* [추가] 사은품 입력 필드에 '만원' 단위 표시 */
+.form-group.gift-group {
+    position: relative;
+}
+
+.form-group.gift-group::after {
+    content: '(만원)';
+    position: absolute;
+    right: 10px;
+    bottom: 11px;
+    color: #888;
+    font-size: 0.9em;
+}
+/* admin-style.css 파일 맨 아래에 추가 */
+
+/* [추가] 사은품 정책 그룹 스타일 */
+.policy-group {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fdfdfd;
+}
+
+.group-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+/* ... (기존 스타일 유지) ... */
+
+/* [추가] 헤더 및 링크 스타일 */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.header-actions { display: flex; gap: 10px; }
+.btn-link {
+    text-decoration: none;
+    color: #555;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s;
+}
+.btn-link:hover { background: #f8f9fa; }
+.btn-link.highlight { color: #007bff; border-color: #007bff; font-weight: 700; }
+
+/* [추가] 탭 네비게이션 스타일 */
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+.tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: #f1f3f5;
+    color: #666;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.tab-btn:hover { background: #e9ecef; }
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+}
+
+/* 탭 콘텐츠 제어 */
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
+.tab-content.active { display: block; }
+
+/* [추가] 상담사 관리 테이블 스타일 */
+.table-responsive { overflow-x: auto; }
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.admin-table th, .admin-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.admin-table th {
+    background-color: #f8f9fa;
+    font-weight: 700;
+    color: #495057;
+}
+.profile-thumb {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.btn-delete:hover { background-color: #c82333; }
+.form-group.full-width { grid-column: 1 / -1; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }

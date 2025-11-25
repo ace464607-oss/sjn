@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성지넷 - 상담사 링크 생성기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* ... (기존 스타일 동일) ... */
+        body { font-family: 'Noto Sans KR', sans-serif; background: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
+        .admin-card { background: white; width: 100%; max-width: 500px; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-bottom: 25px; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: #555; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .preview-box { background: #f8f9fa; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border: 1px solid #eee; }
+        .preview-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
+        .preview-info div { font-size: 14px; }
+        .preview-info strong { font-size: 16px; color: #333; }
+        .btn-generate { width: 100%; background: #007bff; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .btn-generate:hover { background: #0056b3; }
+        .result-area { margin-top: 25px; display: none; }
+        .result-url { width: 100%; background: #e9ecef; padding: 10px; border-radius: 8px; word-break: break-all; font-size: 13px; color: #555; margin-bottom: 10px; }
+        .btn-copy { width: 100%; background: #28a745; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .link-to-admin { display: block; text-align: center; margin-top: 20px; font-size: 13px; color: #888; text-decoration: none; }
+        .link-to-admin:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h2>👩‍💼 상담사 링크 생성기</h2>
+
+        <div class="form-group">
+            <label>상담사 선택 (본인)</label>
+            <select id="manager-select">
+                <option value="">선택해주세요</option>
+            </select>
+        </div>
+
+        <div class="preview-box" id="manager-preview" style="display:none;">
+            <img src="" class="preview-img" id="prev-img">
+            <div class="preview-info">
+                <strong id="prev-name"></strong> <span id="prev-role" style="font-size:11px; color:#666; border:1px solid #ddd; padding:1px 4px; border-radius:4px;"></span><br>
+                <span id="prev-team" style="font-size:12px; color:#007bff;"></span><br>
+                <span id="prev-phone"></span>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <div class="form-group">
+            <label>고객 이름</label>
+            <input type="text" id="customer-name" placeholder="예: 홍길동">
+        </div>
+        
+        <div class="form-group">
+            <label>추천 상품 (선택)</label>
+            <input type="text" id="product-name" placeholder="예: LG 500M + TV" value="LG 1G + 프리미엄 TV">
+        </div>
+
+        <button class="btn-generate" onclick="generateLink()">🔗 링크 생성하기</button>
+
+        <div class="result-area" id="result-area">
+            <label>생성된 링크 (복사해서 고객에게 전송)</label>
+            <div class="result-url" id="final-url"></div>
+            <button class="btn-copy" onclick="copyLink()">📋 링크 복사하기</button>
+        </div>
+
+        <a href="admin-managers.html" class="link-to-admin" target="_blank">⚙️ 상담사 프로필 관리 페이지로 이동</a>
+    </div>
+
+    <script>
+        // [수정] localStorage에서 데이터 불러오기
+        function getManagers() {
+            const data = localStorage.getItem('sjnet_managers');
+            // 데이터가 없으면 기본값 제공
+            return data ? JSON.parse(data) : [
+                { id: "default", name: "홍연주", phone: "010-1234-5678", team: "솔루션제안팀", role: "MANAGER", img: "assets/images/manager_placeholder.png" }
+            ];
+        }
+
+        const managers = getManagers();
+        const selectEl = document.getElementById('manager-select');
+        const previewEl = document.getElementById('manager-preview');
+        
+        managers.forEach(m => {
+            const option = document.createElement('option');
+            option.value = m.id;
+            option.textContent = `${m.name} (${m.team})`;
+            selectEl.appendChild(option);
+        });
+
+        selectEl.addEventListener('change', function() {
+            const selectedId = this.value;
+            // ID 비교 시 형변환 주의 (Date.now()는 숫자일 수 있음)
+            const manager = managers.find(m => String(m.id) === String(selectedId));
+
+            if (manager) {
+                document.getElementById('prev-img').src = manager.img;
+                document.getElementById('prev-name').textContent = manager.name;
+                document.getElementById('prev-phone').textContent = manager.phone;
+                document.getElementById('prev-team').textContent = manager.team;
+                document.getElementById('prev-role').textContent = manager.role;
+                previewEl.style.display = 'flex';
+            } else {
+                previewEl.style.display = 'none';
+            }
+        });
+
+        function generateLink() {
+            const selectedId = selectEl.value;
+            if (!selectedId) { alert('상담사를 선택해주세요.'); return; }
+
+            const manager = managers.find(m => String(m.id) === String(selectedId));
+            const customerName = document.getElementById('customer-name').value.trim() || '고객';
+            const product = document.getElementById('product-name').value.trim();
+
+            const baseUrl = window.location.origin + "/quote.html";
+
+            const params = new URLSearchParams();
+            params.set('name', customerName);
+            params.set('manager', manager.name);
+            params.set('phone', manager.phone);
+            params.set('managerImg', manager.img);
+            // [추가] 팀명과 직책도 파라미터로 전달
+            params.set('team', manager.team);
+            params.set('role', manager.role);
+
+            if(product) params.set('product', product);
+            
+            // 예시 금액
+            params.set('originalPrice', '55000');
+            params.set('price', '38500');
+            params.set('gift', '470000');
+            params.set('secret', '30000');
+            params.set('saving', '600000');
+
+            const finalUrl = `${baseUrl}?${params.toString()}`;
+            
+            document.getElementById('final-url').textContent = finalUrl;
+            document.getElementById('result-area').style.display = 'block';
+        }
+
+        function copyLink() {
+            const urlText = document.getElementById('final-url').textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('링크가 복사되었습니다!');
+            });
+        }
+    </script>
+</body>
+</html>

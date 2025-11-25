@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성지넷 파트너스 - 프리미엄 CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- 엑셀 다운로드를 위한 SheetJS 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --primary-light: #EEF2FF;
+            --bg-body: #F3F4F6;
+            --surface: #FFFFFF;
+            --text-main: #111827;
+            --text-sub: #6B7280;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* --- 로그인 오버레이 --- */
+        #login-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+        }
+        .login-card {
+            background: var(--surface); padding: 40px; border-radius: 24px;
+            box-shadow: var(--shadow-lg); width: 100%; max-width: 400px; text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .login-card h2 { font-size: 24px; margin-bottom: 10px; color: var(--primary); }
+        .login-card p { color: var(--text-sub); margin-bottom: 30px; font-size: 14px; }
+        .login-input {
+            width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border);
+            border-radius: 12px; font-size: 15px; transition: all 0.2s;
+        }
+        .login-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .btn-login {
+            width: 100%; padding: 14px; background: var(--primary); color: white;
+            border: none; border-radius: 12px; font-weight: 600; font-size: 16px;
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-login:active { transform: scale(0.98); }
+
+        /* --- 메인 레이아웃 --- */
+        .crm-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; width: 100%; }
+        
+        /* 헤더 */
+        .crm-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; background: var(--surface); padding: 20px 30px;
+            border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+        }
+        .header-title h1 { font-size: 22px; font-weight: 800; color: var(--text-main); }
+        .header-title p { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+        
+        .manager-profile { display: flex; align-items: center; gap: 15px; }
+        .manager-info { text-align: right; }
+        .manager-info strong { display: block; font-size: 15px; }
+        .manager-info span { font-size: 12px; color: var(--text-sub); background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+        .manager-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-light); }
+        
+        /* 헤더 버튼 그룹 */
+        .header-btn-group { display: flex; gap: 8px; margin-left: 15px; }
+        .btn-header {
+            padding: 8px 16px; border: 1px solid var(--border); background: white;
+            border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-sub);
+            transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-header:hover { background: #F9FAFB; color: var(--primary); border-color: var(--primary); }
+        .btn-logout:hover { color: var(--danger); border-color: #FECACA; }
+
+        /* 대시보드 요약 카드 */
+        .dashboard-stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--surface); padding: 20px; border-radius: 16px;
+            box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 15px;
+            transition: transform 0.2s; border: 1px solid var(--border);
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .stat-icon {
+            width: 50px; height: 50px; border-radius: 12px; display: flex;
+            justify-content: center; align-items: center; font-size: 20px;
+        }
+        .stat-info h3 { font-size: 13px; color: var(--text-sub); font-weight: 500; margin-bottom: 4px; }
+        .stat-info strong { font-size: 24px; font-weight: 800; color: var(--text-main); }
+        
+        .icon-total { background: #F3F4F6; color: #4B5563; }
+        .icon-today { background: #ECFDF5; color: var(--success); }
+        .icon-wait { background: #FFFBEB; color: var(--warning); }
+
+        /* 리스트 컨트롤 바 */
+        .list-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; flex-wrap: wrap; gap: 10px;
+        }
+        .tab-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-tab {
+            padding: 10px 20px; border: none; background: #e5e7eb;
+            border-radius: 10px; font-weight: 600; color: #6b7280;
+            cursor: pointer; transition: all 0.2s; font-size: 14px;
+        }
+        .btn-tab.active {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        .btn-tab:hover:not(.active) { background: #d1d5db; }
+        
+        .badge-count { 
+            background: var(--primary); color: white; font-size: 12px; 
+            padding: 2px 8px; border-radius: 10px; margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .btn-refresh {
+            background: white; border: 1px solid var(--border); padding: 8px 14px;
+            border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text-main);
+            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+        }
+        .btn-refresh:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-refresh i { transition: transform 0.5s; }
+        .btn-refresh:hover i { transform: rotate(180deg); }
+
+        /* 고객 리스트 (카드형) */
+        .customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        
+        .customer-card {
+            background: var(--surface); border-radius: 16px; padding: 24px;
+            box-shadow: var(--shadow-sm); border: 1px solid transparent;
+            transition: all 0.2s ease; position: relative; overflow: hidden;
+        }
+        .customer-card:hover {
+            transform: translateY(-4px); box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .cust-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .cust-time { font-size: 12px; color: var(--text-sub); background: #F9FAFB; padding: 4px 8px; border-radius: 6px; }
+        
+        .cust-details { margin-bottom: 20px; }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-sub); margin-bottom: 6px; }
+        .detail-item i { width: 16px; text-align: center; color: #9CA3AF; }
+        .product-tag {
+            display: inline-block; background: #EEF2FF; color: var(--primary);
+            font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; margin-top: 5px;
+        }
+
+        .card-actions {
+            display: flex; flex-direction: column; gap: 10px; padding-top: 15px; border-top: 1px solid #F3F4F6;
+        }
+        .status-select {
+            width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13px; color: var(--text-main); cursor: pointer;
+        }
+        .btn-action {
+            flex: 1; padding: 8px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-sms { background: var(--primary); color: white; }
+        .btn-sms:hover { background: var(--primary-hover); }
+        
+        /* 모달 공통 */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.visible { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background: var(--surface); width: 90%; max-width: 500px;
+            border-radius: 24px; padding: 30px; box-shadow: var(--shadow-lg);
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-content.x-large { max-width: 1100px; width: 95%; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 20px; font-weight: 700; }
+        .btn-close { background: none; border: none; font-size: 24px; color: var(--text-sub); cursor: pointer; }
+
+        /* SMS 모달 */
+        .sms-preview {
+            background: #F3F4F6; padding: 20px; border-radius: 16px;
+            font-size: 14px; line-height: 1.6; color: #374151;
+            margin-bottom: 20px; white-space: pre-wrap; border: 1px solid var(--border);
+        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-modal {
+            flex: 1; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none;
+        }
+        .btn-copy { background: #E5E7EB; color: var(--text-main); }
+        .btn-send { background: var(--success); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 6px; }
+
+        /* 전문가용 견적 테이블 */
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .admin-table th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #eee; position: sticky; top: 0; white-space: nowrap; }
+        .admin-table td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .admin-table tr:hover { background: #f0f8ff; cursor: pointer; }
+
+        /* 로딩 스피너 */
+        .spinner {
+            border: 3px solid #f3f3f3; border-top: 3px solid var(--primary);
+            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite;
+            margin: 50px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .empty-state { text-align: center; padding: 60px 0; color: var(--text-sub); }
+        .empty-state i { font-size: 48px; color: #D1D5DB; margin-bottom: 15px; }
+
+        /* 폼 그룹 스타일 */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #374151; }
+
+        /* [신규] 스마트 태그(Chip) 스타일 */
+        .mobile-chips-area {
+            border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+            min-height: 45px; display: flex; flex-wrap: wrap; gap: 8px;
+            background: #fff; margin-bottom: 8px; align-items: center;
+        }
+        .mobile-chip {
+            background: #EEF2FF; color: #4F46E5; font-size: 12px; font-weight: 700;
+            padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px;
+            border: 1px solid #C7D2FE; cursor: pointer; transition: all 0.2s;
+        }
+        .mobile-chip:hover { background: #E0E7FF; }
+        .mobile-chip i { font-size: 10px; color: #818CF8; }
+        .mobile-chip-placeholder { color: #9CA3AF; font-size: 13px; }
+        .mobile-chip.youth { background: #ECFDF5; color: #059669; border-color: #A7F3D0; } /* 청소년 태그 스타일 */
+        
+        .chip-add-btn {
+            padding: 6px 12px; font-size: 12px; border-radius: 20px; border: 1px solid var(--border);
+            background: white; cursor: pointer; font-weight: 600; color: #374151; transition: all 0.2s;
+        }
+        .chip-add-btn:hover { background: #F3F4F6; border-color: #D1D5DB; }
+        .chip-add-btn.high { color: #DC2626; border-color: #FECACA; background: #FEF2F2; }
+        .chip-add-btn.mid { color: #059669; border-color: #A7F3D0; background: #ECFDF5; }
+
+        /* [신규] 청소년 체크박스 스타일 */
+        .youth-toggle {
+            display: inline-flex; align-items: center; gap: 5px; margin-right: 10px;
+            font-size: 13px; font-weight: 600; color: #059669;
+            background: #ECFDF5; padding: 4px 10px; border-radius: 20px; border: 1px solid #A7F3D0;
+        }
+        .youth-toggle input { cursor: pointer; }
+
+        /* 상세 견적 테이블 스타일 */
+        .detail-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+        .detail-table th, .detail-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .detail-table th { text-align: left; color: #666; font-weight: 500; width: 40%; }
+        .detail-table td { text-align: right; font-weight: 700; color: #333; }
+        .detail-table .discount-row td { color: #DC2626; }
+        .detail-table .total-row td { font-size: 18px; color: #4F46E5; border-top: 2px solid #333; padding-top: 15px; }
+        .detail-table .benefit-row td { color: #059669; }
+        .detail-table .secret-row td { color: #7C3AED; font-weight: 800; }
+
+        /* [신규] 전문가용 견적 센터 컨트롤 패널 스타일 개선 */
+        .expert-controls {
+            background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px;
+            border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+        }
+        .expert-controls-row {
+            display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 15px;
+        }
+        .expert-controls-row:last-child { margin-bottom: 0; justify-content: flex-end; }
+        
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { font-size: 12px; font-weight: 700; color: var(--text-sub); }
+        .control-group select, .control-group input {
+            padding: 10px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 14px; min-width: 120px;
+        }
+        .control-group select:focus, .control-group input:focus {
+            border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .btn-action-lg {
+            height: 42px; padding: 0 24px; border-radius: 8px; font-weight: 700; font-size: 14px;
+            cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-primary-lg { background: var(--primary); color: white; }
+        .btn-primary-lg:hover { background: var(--primary-hover); box-shadow: var(--shadow-md); }
+        
+        .btn-success-lg { background: var(--success); color: white; }
+        .btn-success-lg:hover { background: #059669; box-shadow: var(--shadow-md); }
+
+        /* [신규] 모바일 최적화 */
+        @media (max-width: 768px) {
+            .crm-container { padding: 15px; }
+            .crm-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .manager-profile { width: 100%; justify-content: space-between; }
+            .expert-controls-row { flex-direction: column; align-items: stretch; }
+            .control-group { width: 100%; }
+            .control-group select, .control-group input { width: 100%; }
+            .btn-action-lg { width: 100%; justify-content: center; }
+            .expert-results { overflow-x: auto; } /* 테이블 가로 스크롤 */
+            .admin-table th, .admin-table td { white-space: nowrap; padding: 10px 5px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로그인 화면 -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>👩‍💼 파트너스 로그인</h2>
+            <p>등록된 상담사 계정으로 접속해주세요.</p>
+            <select id="manager-select" class="login-input">
+                <option value="">상담사 선택</option>
+            </select>
+            <input type="password" id="manager-pw" placeholder="비밀번호 (a0909)" class="login-input">
+            <button id="btn-login" class="btn-login">로그인하기</button>
+        </div>
+    </div>
+
+    <!-- 메인 CRM 화면 -->
+    <div class="crm-container" id="crm-app" style="display:none;">
+        
+        <!-- 헤더 -->
+         <header class="crm-header">
+            <div class="header-title">
+                <h1>고객 관리 대시보드</h1>
+                <p>오늘도 좋은 성과 있으시길 바랍니다! 💪</p>
+            </div>
+            <div class="manager-profile">
+                <div class="manager-info">
+                    <strong id="display-name">홍연주</strong>
+                    <span id="display-team">솔루션제안팀</span>
+                </div>
+                <img id="display-img" src="assets/images/manager_placeholder.png" class="manager-img" 
+                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==';">
+                
+                <!-- 헤더 버튼 그룹 -->
+                <div class="header-btn-group">
+                    <a href="index.html" target="_blank" class="btn-header">
+                        <i class="fas fa-home"></i> 홈으로
+                    </a>
+                    <button onclick="logout()" class="btn-header btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> 로그아웃
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 통계 요약 -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon icon-total"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3>총 배정 고객</h3>
+                    <strong id="stat-total">0</strong>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-today"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-info">
+                    <h3>오늘 신규 접수</h3>
+                    <strong id="stat-today">0</strong>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-wait"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3>상담 대기</h3>
+                    <strong id="stat-pending">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 리스트 컨트롤 -->
+        <div class="list-controls">
+            <div class="tab-buttons">
+                <button id="tab-my" class="btn-tab active" onclick="switchTab('my')">
+                    📂 내 담당 고객
+                </button>
+                <button id="tab-new" class="btn-tab" onclick="switchTab('unassigned')">
+                    🔔 신규 문의 (공통)
+                </button>
+                <span class="badge-count" id="list-count">0</span>
+            </div>
+            <button onclick="reloadCurrentTab()" class="btn-refresh">
+                <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
+        </div>
+
+        <!-- 고객 리스트 그리드 -->
+        <div id="customer-list" class="customer-grid">
+            <div class="spinner"></div>
+        </div>
+
+    </div>
+
+    <!-- SMS 모달 -->
+    <div class="modal-overlay" id="sms-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💬 SMS 발송 템플릿</h2>
+                <button class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:15px; font-size:14px; color:#666;">
+                    고객님께 보낼 맞춤형 견적 메시지입니다.<br>단축 URL이 포함되어 있습니다.
+                </p>
+                <div class="sms-preview" id="sms-content" contenteditable="true">
+                    생성 중...
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal btn-copy" onclick="copySMS()">
+                        <i class="far fa-copy"></i> 텍스트 복사
+                    </button>
+                    <a id="sms-link-btn" href="#" class="btn-modal btn-send">
+                        <i class="fas fa-paper-plane"></i> 문자 보내기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [신규] 간편 견적 수정 모달 (Mini Builder) -->
+    <div class="modal-overlay" id="quote-builder-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚡ 간편 견적 수정</h2>
+                <button class="btn-close" onclick="closeQuoteBuilder()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="qb-customer-id">
+                
+                <div class="form-group">
+                    <label>통신사</label>
+                    <div class="tab-buttons" style="margin-bottom:10px;">
+                        <button type="button" class="btn-tab active" onclick="setCarrier('LG')">LG</button>
+                        <button type="button" class="btn-tab" onclick="setCarrier('SK')">SK</button>
+                        <button type="button" class="btn-tab" onclick="setCarrier('KT')">KT</button>
+                    </div>
+                    <input type="hidden" id="qb-carrier" value="LG">
+                </div>
+
+                <div class="form-group" style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>인터넷</label>
+                        <select id="qb-internet" class="login-input" onchange="autoCalculate()">
+                            <option value="100">100M</option>
+                            <option value="500" selected>500M</option>
+                            <option value="1000">1G</option>
+                        </select>
+                    </div>
+                    <div style="flex:1">
+                        <label>TV</label>
+                        <select id="qb-tv" class="login-input" onchange="autoCalculate()">
+                            <option value="none">신청안함</option>
+                            <option value="basic" selected>베이직/일반</option>
+                            <option value="premium">프리미엄/고급</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="background:#f9f9f9; padding:15px; border-radius:8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <label>월 요금 (원)</label>
+                        <input type="text" id="qb-price" class="login-input" style="width:100px; text-align:right; font-weight:bold; color:#007bff;">
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <label>사은품 (원)</label>
+                        <input type="text" id="qb-gift" class="login-input" style="width:100px; text-align:right; font-weight:bold; color:#dc3545;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>비밀 지원금 (선택)</label>
+                    <input type="text" id="qb-secret" class="login-input" placeholder="0">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-modal btn-send" onclick="saveQuoteAndClose()">💾 저장 및 문자발송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- [신규] 전문가용 견적 비교 센터 모달 (Expert Center) -->
+    <div class="modal-overlay" id="expert-quote-modal">
+        <div class="modal-content x-large" style="height: 90vh; display:flex; flex-direction:column;">
+            <div class="modal-header">
+                <h2>📊 전문가용 견적 비교 센터</h2>
+                <button class="btn-close" onclick="closeExpertQuote()">&times;</button>
+            </div>
+            
+            <!-- 상단 컨트롤 패널 (디자인 개선) -->
+            <div class="expert-controls">
+                <div class="expert-controls-row">
+                    <div class="control-group">
+                        <label>인터넷 속도</label>
+                        <select id="eq-internet">
+                            <option value="100">100M</option>
+                            <option value="500" selected>500M</option>
+                            <option value="1000">1G</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>TV 상품</label>
+                        <select id="eq-tv">
+                            <option value="none">신청안함</option>
+                            <option value="basic" selected>베이직/일반</option>
+                            <option value="premium">프리미엄/고급</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>TV 추가</label>
+                        <select id="eq-add-tv">
+                            <option value="0">없음</option>
+                            <option value="1">1대</option>
+                            <option value="2">2대</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 가족 구성원 스마트 태그 빌더 -->
+                    <div class="control-group" style="flex:1; min-width:300px;">
+                        <label>가족 요금제 구성 (클릭하여 추가)</label>
+                        <div class="mobile-chips-area" id="mobile-chips-area">
+                            <span class="mobile-chip-placeholder">가족 구성원을 추가해주세요</span>
+                        </div>
+                        <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap; align-items:center;">
+                            <label class="youth-toggle">
+                                <input type="checkbox" id="is-youth-mode"> 청소년 적용
+                            </label>
+                            <button class="chip-add-btn high" onclick="addMobileLine(80000)">+ 8만원↑</button>
+                            <button class="chip-add-btn high" onclick="addMobileLine(70000)">+ 7만원대</button>
+                            <button class="chip-add-btn mid" onclick="addMobileLine(60000)">+ 6만원대</button>
+                            <button class="chip-add-btn mid" onclick="addMobileLine(50000)">+ 5만원대</button>
+                            <button class="chip-add-btn" onclick="addMobileLine(40000)">+ 4만원대</button>
+                            <button class="chip-add-btn" onclick="addMobileLine(30000)">+ 3만원대</button>
+                            <button class="chip-add-btn" style="color:#666;" onclick="resetMobileLines()"><i class="fas fa-undo"></i> 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>비밀 지원금</label>
+                        <input type="text" id="eq-secret" style="text-align:right;" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- 버튼 그룹 (별도 행으로 분리) -->
+                <div class="expert-controls-row">
+                    <button id="btn-run-expert" type="button" class="btn-action-lg btn-primary-lg" onclick="runExpertAnalysis()">
+                        <i class="fas fa-calculator"></i> 전체 비교 산출
+                    </button>
+                    <button type="button" class="btn-action-lg btn-success-lg" onclick="downloadExcel()">
+                        <i class="fas fa-file-excel"></i> 엑셀 다운로드
+                    </button>
+                </div>
+            </div>
+
+            <!-- 결과 리스트 -->
+            <div class="expert-results" style="flex: 1; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                <table class="admin-table">
+                    <thead style="position:sticky; top:0; z-index:10;">
+                        <tr>
+                            <th>통신사</th>
+                            <th>상품명 (결합종류)</th>
+                            <th style="cursor:pointer" onclick="sortResults('price')">월 요금 <i class="fas fa-sort"></i></th>
+                            <th style="cursor:pointer" onclick="sortResults('gift')">사은품 <i class="fas fa-sort"></i></th>
+                            <th>휴대폰 할인</th>
+                            <th style="cursor:pointer" onclick="sortResults('benefit')">총 혜택 환산 <i class="fas fa-sort"></i></th>
+                            <!-- [신규] 3년 실비용 컬럼 추가 -->
+                            <th style="cursor:pointer" onclick="sortResults('realCost')">3년 실비용 <i class="fas fa-sort"></i></th>
+                            <th>선택</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expert-list-body">
+                        <!-- JS로 생성됨 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top:10px; text-align:right; font-size:12px; color:#666;">
+                * 행을 클릭하거나 [선택] 버튼을 누르면 해당 견적이 고객에게 저장됩니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 견적서 모달 -->
+    <div class="modal-overlay" id="expert-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🧾 상세 견적서</h2>
+                <button class="btn-close" onclick="closeExpertDetail()">&times;</button>
+            </div>
+            <div class="modal-body" id="expert-detail-body">
+                <!-- JS로 내용 채움 -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-copy" onclick="closeExpertDetail()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/manager-crm.js"></script>
+</body>
+</html>

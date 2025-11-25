@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>꿀팁게시판 - 성지넷</title>
+
+  <!-- 프로젝트에서 이미 쓰는 공통 CSS가 있으면 그대로 두고, 없으면 아래만 있어도 동작은 합니다 -->
+  <!-- <link rel="stylesheet" href="./css/reset.css" /> -->
+  <!-- <link rel="stylesheet" href="./css/common.css" /> -->
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.08);
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --border-subtle: #e5e7eb;
+      --bg-soft: #f9fafb;
+      --radius-lg: 18px;
+      --radius-full: 999px;
+      --shadow-card: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard",
+        "Apple SD Gothic Neo", sans-serif;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .board-wrap {
+      max-width: 1200px;
+      margin: 40px auto 80px;
+      padding: 0 16px 80px;
+    }
+
+    .board-header {
+      margin-bottom: 24px;
+    }
+
+    .board-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .board-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .board-search {
+      margin-top: 24px;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .board-search input {
+      width: 100%;
+      padding: 10px 40px 10px 40px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 14px;
+      background: #f9fafb;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease,
+        background-color 0.15s ease;
+    }
+
+    .board-search input::placeholder {
+      color: #9ca3af;
+    }
+
+    .board-search input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2),
+        0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .board-search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    .board-filter {
+      margin-top: 18px;
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      font-size: 13px;
+      padding: 6px 14px;
+      background: transparent;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease,
+        box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+    }
+
+    .filter-chip:hover {
+      background: var(--bg-soft);
+    }
+
+    .filter-chip.is-active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .tips-section {
+      margin-top: 28px;
+    }
+
+    /* 👇 여기: 한 줄에 4개로 고정 + 반응형 */
+    .tip-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    @media (max-width: 1024px) {
+      .tip-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tip-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .board-wrap {
+        margin-top: 24px;
+        padding-bottom: 40px;
+      }
+
+      .board-title {
+        font-size: 22px;
+      }
+
+      .tip-card {
+        padding: 14px 14px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tip-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tip-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      background: #ffffff;
+      padding: 7px 7px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease,
+        border-color 0.18s ease, background-color 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .tip-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+      border-color: rgba(37, 99, 235, 0.38);
+    }
+
+    /* 👇 썸네일 영역 추가 (높이 축소) */
+    .tip-card__thumb {
+      width: 100%;
+      height: 150px;
+      /* 예전보다 1/3 정도로 줄인 느낌 */
+      overflow: hidden;
+      border-radius: 8px;
+      margin: 0 0 10px;
+      /* 👈 위·옆 여백 제거, 아래만 살짝 */
+      background: #e5e7eb;
+    }
+
+    .tip-card__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      /* 둥근 정도 */
+    }
+
+    .tip-card__category {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      padding: 4px 10px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .tip-card__title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-top: 4px;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 21;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: keep-all;
+    }
+
+    .tip-card__summary {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.55;
+      margin: 0;
+      display: none;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: keep-all;
+    }
+
+    .tip-card__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    .tip-card__meta-dot::before {
+      content: "•";
+      margin: 0 2px;
+    }
+
+    .tip-card__badge {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    /* 검색 하이라이트 */
+    .search-highlight {
+      background: rgba(250, 204, 21, 0.35);
+      padding: 0 2px;
+      border-radius: 4px;
+    }
+
+    /* 빈 상태 */
+    .tips-empty {
+      margin-top: 40px;
+      padding: 56px 16px 64px;
+      border-radius: 24px;
+      background: var(--bg-soft);
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      text-align: center;
+      color: var(--text-sub);
+    }
+
+    .tips-empty__title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .tips-empty__desc {
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .tips-empty__action {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* 스켈레톤 로딩 */
+    .tip-card--skeleton {
+      cursor: default;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .skeleton-block,
+    .skeleton-line {
+      position: relative;
+      overflow: hidden;
+      background: #e5e7eb;
+    }
+
+    .skeleton-block {
+      border-radius: 14px;
+      height: 80px;
+      margin-bottom: 10px;
+    }
+
+    .skeleton-line {
+      height: 9px;
+      border-radius: 999px;
+      margin-top: 6px;
+    }
+
+    .skeleton-line.w-40 {
+      width: 40%;
+    }
+
+    .skeleton-line.w-60 {
+      width: 60%;
+    }
+
+    .skeleton-line.w-80 {
+      width: 80%;
+    }
+
+    .skeleton-animate::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.7) 50%,
+          rgba(255, 255, 255, 0) 100%);
+      animation: skeleton-shimmer 1.25s infinite;
+    }
+
+    @keyframes skeleton-shimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* 모달 스타일 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.visible .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      padding-right: 40px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      position: absolute;
+      right: 24px;
+      top: 20px;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .board-view-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .view-category {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .board-view-content {
+      line-height: 1.7;
+      font-size: 16px;
+      color: #374151;
+    }
+
+    .board-view-content h2 {
+      font-size: 1.4em;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    .board-view-content h3 {
+      font-size: 1.2em;
+      margin-top: 25px;
+      margin-bottom: 10px;
+    }
+
+    .board-view-content p {
+      margin-bottom: 15px;
+    }
+
+    .board-view-content ul,
+    .board-view-content ol {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+
+    .board-view-content li {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-header h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="board-wrap">
+    <header class="board-header">
+      <h1 class="board-title">꿀팁게시판</h1>
+      <p class="board-desc">
+        인터넷· TV· 휴대폰 요금 절약 꿀팁을 모아두는 공간입니다.
+      </p>
+
+      <div class="board-search">
+        <span class="board-search-icon">🔍</span>
+        <input id="tips-search" data-role="tips-search" type="search" placeholder="제목·요약·카테고리로 검색해 보세요"
+          autocomplete="off" />
+      </div>
+
+      <div class="board-filter" aria-label="카테고리 필터">
+        <button type="button" class="filter-chip is-active" data-filter="all">
+          전체
+        </button>
+        <button type="button" class="filter-chip" data-filter="인터넷">
+          인터넷
+        </button>
+        <!-- 👇 여기 오타 수정됨 -->
+        <button type="button" class="filter-chip" data-filter="휴대폰">
+          휴대폰
+        </button>
+        <button type="button" class="filter-chip" data-filter="카드">
+          카드
+        </button>
+      </div>
+    </header>
+
+    <section class="tips-section" aria-live="polite">
+      <div id="tips-list" data-role="tips-list" class="tip-grid">
+        <!-- JS에서 카드 / 스켈레톤이 들어갑니다 -->
+      </div>
+
+      <div id="tips-empty" class="tips-empty" hidden>
+        <p class="tips-empty__title">등록된 꿀팁이 없습니다.</p>
+        <p class="tips-empty__desc">
+          새로운 꿀팁을 작성하면 이곳에 카드가 채워집니다.
+        </p>
+        <p class="tips-empty__action">오른쪽 위 &lsquo;꿀팁 작성하기&rsquo;에서 글을 올려 보세요.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 게시글 목록 로직 -->
+  <!-- 게시글 상세 모달 -->
+  <div class="modal-overlay" id="view-modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="view-title">제목</h2>
+        <button class="modal-close-btn" id="view-modal-close" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="board-view-meta">
+          <span id="view-category" class="view-category">카테고리</span>
+          <span class="meta-divider">|</span>
+          <span id="view-author">성지넷</span>
+          <span class="meta-divider">|</span>
+          <span id="view-date">2024.01.01</span>
+        </div>
+        <div id="view-img-wrapper" style="display:none; margin-bottom: 20px;">
+          <img id="view-img" src="" alt="첨부이미지" style="width:100%; border-radius:12px;">
+        </div>
+        <div id="view-content" class="board-view-content">내용</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/board-list.js"></script>
+</body>
+
+</html>

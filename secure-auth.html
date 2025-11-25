@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>성지넷 안전 인증센터</title>
+
+  <!-- 성지넷 공통 스타일 (필요 시 유지) -->
+  <link rel="stylesheet" href="css/style-main.css" />
+  <link rel="stylesheet" href="css/style-features.css" />
+
+  <style>
+    :root {
+      --secure-primary: #1750a6;
+      --secure-primary-dark: #123f82;
+      --secure-bg: #f3f5fb;
+      --secure-card-bg: #ffffff;
+      --secure-border: #d0d4dd;
+      --secure-text-main: #222;
+      --secure-text-sub: #555;
+      --secure-text-muted: #888;
+      --secure-error: #e03131;
+      --secure-radius-card: 18px;
+      --secure-radius-input: 10px;
+    }
+
+    body.secure-body {
+      background: radial-gradient(circle at top left, #e3ebff 0, #f3f5fb 42%, #f5f7fc 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: var(--secure-text-main);
+    }
+
+    .secure-main-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 12px 32px;
+    }
+
+    .secure-page {
+      width: 100%;
+      max-width: 540px;
+      background: var(--secure-card-bg);
+      border-radius: var(--secure-radius-card);
+      padding: 26px 22px 28px;
+      box-shadow:
+        0 22px 45px rgba(15, 35, 90, 0.18),
+        0 0 0 1px rgba(198, 205, 230, 0.8);
+      box-sizing: border-box;
+      border: 1px solid rgba(219, 226, 244, 0.9);
+    }
+
+    .secure-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .secure-mini-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--secure-text-muted);
+    }
+
+    .secure-mini-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #ff5a4d;
+    }
+
+    .secure-mini-brand span.brand-main {
+      font-weight: 600;
+      color: #000;
+    }
+
+    .secure-mini-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f1f4ff;
+      color: var(--secure-primary);
+      border: 1px solid rgba(23, 80, 166, 0.12);
+    }
+
+    .secure-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #eef4ff;
+      color: var(--secure-primary);
+      margin-bottom: 10px;
+    }
+
+    .secure-badge-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--secure-primary);
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .secure-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .secure-subtitle {
+      font-size: 13px;
+      color: var(--secure-text-sub);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    /* 단계 탭 영역 */
+    .secure-step-indicator {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 11px;
+      flex-wrap: wrap;
+    }
+
+    .secure-step-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f1f3fb;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(180, 188, 210, 0.8);
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .secure-step-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #c8d0e5;
+    }
+
+    .secure-step-pill.active {
+      background: var(--secure-primary);
+      color: #fff;
+      border-color: rgba(23, 80, 166, 0.9);
+    }
+
+    .secure-step-pill.active::before {
+      background: #ffec99;
+    }
+
+    .secure-info-box {
+      background: #f7f9ff;
+      border-radius: 12px;
+      padding: 12px 12px 10px;
+      font-size: 11px;
+      color: #444;
+      margin-bottom: 18px;
+      border: 1px solid rgba(204, 213, 255, 0.7);
+    }
+
+    .secure-info-box strong {
+      font-weight: 700;
+    }
+
+    .secure-info-list {
+      margin: 6px 0 0;
+      padding-left: 16px;
+    }
+
+    .secure-step-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .secure-step-title::before {
+      content: "";
+      width: 3px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--secure-primary);
+    }
+
+    .secure-form-group {
+      margin-bottom: 12px;
+    }
+
+    .secure-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .secure-label span.helper {
+      font-size: 11px;
+      color: var(--secure-text-muted);
+    }
+
+    .secure-input,
+    .secure-select {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: var(--secure-radius-input);
+      border: 1px solid var(--secure-border);
+      font-size: 14px;
+      box-sizing: border-box;
+      background: #fff;
+      transition: border 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .secure-input::placeholder,
+    .secure-select::placeholder {
+      color: #c0c4d0;
+    }
+
+    .secure-input:focus,
+    .secure-select:focus {
+      outline: none;
+      border-color: var(--secure-primary);
+      box-shadow: 0 0 0 1px rgba(23, 80, 166, 0.18);
+      background: #fbfcff;
+    }
+
+    .secure-rn-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .secure-rn-wrapper input {
+      flex: 1;
+    }
+
+    .secure-rn-hyphen {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .secure-account-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .secure-checkbox-group {
+      margin-top: 16px;
+      font-size: 12px;
+    }
+
+    .secure-checkbox-group label {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .secure-checkbox-group input[type="checkbox"] {
+      margin-top: 2px;
+      min-width: 16px;
+      min-height: 16px;
+    }
+
+    .secure-terms-link {
+      font-size: 11px;
+      color: var(--secure-primary);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .secure-submit {
+      margin-top: 20px;
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background: var(--secure-primary);
+      color: #fff;
+      transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.12s ease;
+      box-shadow: 0 8px 18px rgba(23, 80, 166, 0.28);
+    }
+
+    .secure-submit:not(:disabled):hover {
+      background: var(--secure-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(23, 80, 166, 0.3);
+    }
+
+    .secure-submit:disabled {
+      background: #c4cad8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .secure-footer-text {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #777;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .field-error {
+      color: var(--secure-error);
+      font-size: 11px;
+      margin-top: 3px;
+      display: none;
+    }
+
+    /* ✅ 모바일 최적화: 화면 꽉 채우기 + 크게 보이게 */
+    @media (max-width: 600px) {
+      body.secure-body {
+        background: #f5f7fc;
+      }
+
+      .secure-main-wrapper {
+        padding: 0;
+      }
+
+      .secure-page {
+        max-width: 100%;
+        border-radius: 0;
+        min-height: 100vh;
+        box-shadow: none;
+        border: none;
+        padding: 18px 16px 24px;
+      }
+
+      .secure-title {
+        font-size: 20px;
+      }
+
+      .secure-subtitle {
+        font-size: 13px;
+      }
+
+      .secure-input,
+      .secure-select {
+        font-size: 15px;
+        padding: 12px 13px;
+      }
+
+      .secure-label {
+        font-size: 13px;
+      }
+
+      .secure-step-indicator {
+        font-size: 12px;
+      }
+
+      .secure-submit {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 14px;
+      }
+
+      .secure-checkbox-group {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body class="secure-body">
+  <main class="secure-main-wrapper">
+    <section class="secure-page" aria-labelledby="secure-title">
+      <div class="secure-header-line">
+        <div class="secure-mini-brand">
+          <span class="brand-main">성지넷 안전 인증센터</span>
+          <span class="secure-mini-dot"></span>
+          <span>본인 확인 및 계좌 인증</span>
+        </div>
+        <span class="secure-mini-badge">HTTPS 암호화</span>
+      </div>
+
+      <div class="secure-badge">
+        <span class="secure-badge-icon">🔒</span>
+        <span>주민번호·계좌번호, 여기서 직접 입력하세요</span>
+      </div>
+
+      <h1 id="secure-title" class="secure-title">전화로 말하지 않고, 화면에서 직접 입력</h1>
+      <p class="secure-subtitle">
+        상담원이 주민번호·계좌번호를 직접 듣지 않고, 고객님만 보는 안전한 화면에서 입력하실 수 있습니다.
+      </p>
+
+      <div class="secure-step-indicator">
+        <span class="secure-step-pill step-pill active" data-step="1">1. 기본 정보</span>
+        <span class="secure-step-pill step-pill" data-step="2">2. 주민등록번호</span>
+        <span class="secure-step-pill step-pill" data-step="3">3. 계좌 정보</span>
+      </div>
+
+      <div class="secure-info-box">
+        <strong>안전하게 처리됩니다.</strong>
+        <ul class="secure-info-list">
+          <li>이 페이지는 <strong>암호화(HTTPS)</strong> 통신으로 보호됩니다.</li>
+          <li>상담 직원은 주민번호·계좌번호를 <strong>직접 듣지 않습니다.</strong></li>
+          <li>가입 처리에 필요한 범위 내에서만 이용되며, 관련 법령에 따라 <strong>안전하게 보관·파기</strong>됩니다.</li>
+        </ul>
+      </div>
+
+      <form id="secure-auth-form" novalidate>
+        <!-- 1단계: 기본 정보 -->
+        <h2 class="secure-step-title">1. 기본 정보</h2>
+
+        <div class="secure-form-group">
+          <label class="secure-label" for="customer-name">
+            <span>성명</span>
+            <span class="helper">가입자 명의 기준</span>
+          </label>
+          <input
+            type="text"
+            id="customer-name"
+            name="name"
+            class="secure-input"
+            placeholder="예) 홍길동"
+            pattern="^[a-zA-Z가-힣]{2,}$"
+            required
+          />
+          <span class="field-error" id="error-name"></span>
+        </div>
+
+        <div class="secure-form-group">
+          <label class="secure-label" for="customer-phone">
+            <span>휴대폰 번호</span>
+            <span class="helper">진행 안내 및 본인 확인용</span>
+          </label>
+          <input
+            type="tel"
+            id="customer-phone"
+            name="phone"
+            class="secure-input"
+            placeholder="예) 010-1234-5678"
+            required
+          />
+          <span class="field-error" id="error-phone"></span>
+        </div>
+
+        <!-- 2단계: 주민등록번호 -->
+        <h2 class="secure-step-title">2. 주민등록번호</h2>
+
+        <div class="secure-form-group">
+          <label class="secure-label">
+            <span>주민등록번호</span>
+            <span class="helper">통신사 본인 인증 및 가입자 등록용</span>
+          </label>
+          <div class="secure-rn-wrapper">
+            <input
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              class="secure-input"
+              name="rrn_front"
+              id="rrn-front"
+              placeholder="앞 6자리 (예: 900101)"
+              required
+            />
+            <span class="secure-rn-hyphen">-</span>
+            <input
+              type="password"
+              inputmode="numeric"
+              maxlength="7"
+              class="secure-input"
+              name="rrn_back"
+              id="rrn-back"
+              placeholder="뒤 7자리"
+              required
+            />
+          </div>
+          <span class="field-error" id="error-rrn"></span>
+          <p class="secure-footer-text" style="margin-top:6px;">
+            • 주민등록번호는 통신사 전산 본인인증을 위해 사용되며,<br />
+            &nbsp;&nbsp;가입 처리 목적 외로 저장·이용되지 않습니다.
+          </p>
+        </div>
+
+        <!-- 3단계: 계좌 정보 -->
+        <h2 class="secure-step-title">3. 계좌 정보</h2>
+
+        <div class="secure-form-group">
+          <label class="secure-label" for="bank-name">
+            <span>은행명</span>
+          </label>
+          <select
+            id="bank-name"
+            name="bank"
+            class="secure-select"
+            required
+          >
+            <option value="">은행을 선택해주세요</option>
+            <option value="국민">국민은행</option>
+            <option value="신한">신한은행</option>
+            <option value="농협">농협은행</option>
+            <option value="우리">우리은행</option>
+            <option value="하나">하나은행</option>
+            <option value="카카오뱅크">카카오뱅크</option>
+            <option value="토스뱅크">토스뱅크</option>
+          </select>
+          <span class="field-error" id="error-bank"></span>
+        </div>
+
+        <div class="secure-form-group">
+          <label class="secure-label">
+            <span>계좌번호</span>
+            <span class="helper">자동이체 및 요금 납부 계좌</span>
+          </label>
+          <div class="secure-account-wrapper">
+            <input
+              type="text"
+              inputmode="numeric"
+              class="secure-input"
+              id="account-number"
+              name="account_number"
+              placeholder="숫자만 입력"
+              required
+            />
+          </div>
+          <span class="field-error" id="error-account"></span>
+        </div>
+
+        <!-- 동의 영역 -->
+        <div class="secure-checkbox-group">
+          <!-- 전체 동의 -->
+          <label>
+            <input type="checkbox" id="agree-all" />
+            <span>
+              (전체 동의) 아래 항목 전체에 동의합니다.
+            </span>
+          </label>
+
+          <label>
+            <input type="checkbox" id="agree-privacy" required />
+            <span>
+              (필수) 개인정보 수집·이용 및 전자적 전송에 동의합니다.<br />
+              <span class="secure-terms-link" onclick="openPrivacyPolicy()">
+                개인정보 처리방침 보기
+              </span>
+            </span>
+          </label>
+          <label>
+            <input type="checkbox" id="agree-telecom" required />
+            <span>
+              (필수) 선택하신 통신사 가입 및 본인 인증을 위한 정보 제공에 동의합니다.
+            </span>
+          </label>
+          <label>
+            <input type="checkbox" id="agree-marketing" />
+            <span>
+              (선택) 할인/프로모션 안내 문자 수신에 동의합니다.
+            </span>
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          id="secure-submit-btn"
+          class="secure-submit"
+          disabled
+        >
+          안전하게 전송하기
+        </button>
+
+        <p class="secure-footer-text">
+          성지넷은 고객님의 민감한 정보를 안전하게 보호하기 위해 노력합니다.<br />
+          전화로 말씀하시기 부담스러운 정보는 이 화면에서만 입력해주세요.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('secure-auth-form');
+    const submitBtn = document.getElementById('secure-submit-btn');
+
+    const nameInput = document.getElementById('customer-name');
+    const phoneInput = document.getElementById('customer-phone');
+    const rrnFrontInput = document.getElementById('rrn-front');
+    const rrnBackInput = document.getElementById('rrn-back');
+    const bankSelect = document.getElementById('bank-name');
+    const accountInput = document.getElementById('account-number');
+
+    const errorName = document.getElementById('error-name');
+    const errorPhone = document.getElementById('error-phone');
+    const errorRrn = document.getElementById('error-rrn');
+    const errorBank = document.getElementById('error-bank');
+    const errorAccount = document.getElementById('error-account');
+
+    const agreePrivacy = document.getElementById('agree-privacy');
+    const agreeTelecom = document.getElementById('agree-telecom');
+    const agreeMarketing = document.getElementById('agree-marketing');
+    const agreeAll = document.getElementById('agree-all');
+
+    const stepPills = document.querySelectorAll('.step-pill');
+
+    function setActiveStep(step) {
+      stepPills.forEach(pill => {
+        if (pill.dataset.step === String(step)) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+
+    function showError(span, message) {
+      span.textContent = message;
+      span.style.display = 'block';
+    }
+
+    function clearError(span) {
+      span.textContent = '';
+      span.style.display = 'none';
+    }
+
+    function validateName() {
+      const value = nameInput.value.trim();
+      const pattern = /^[a-zA-Z가-힣]{2,}$/;
+      if (!pattern.test(value)) {
+        showError(errorName, '이름은 2글자 이상, 한글 또는 영문만 가능합니다.');
+        return false;
+      }
+      clearError(errorName);
+      return true;
+    }
+
+    // 휴대폰 번호: 자동 하이픈 + 숫자 기준 유효성 검사
+    function autoHyphenPhone(value) {
+      value = value.replace(/[^0-9]/g, "");
+      if (value.length < 4) return value;
+      if (value.length < 7) return value.replace(/(01[0-9])([0-9]+)/, "$1-$2");
+      return value.replace(/(01[0-9])([0-9]{3,4})([0-9]+)/, "$1-$2-$3");
+    }
+
+    function validatePhone() {
+      const raw = phoneInput.value.trim();
+      const digits = raw.replace(/[^0-9]/g, "");
+      const pattern = /^01[0-9]{8,9}$/;
+      if (!pattern.test(digits)) {
+        showError(errorPhone, '휴대폰 번호 형식이 올바르지 않습니다. (예: 010-1234-5678)');
+        return false;
+      }
+      clearError(errorPhone);
+      return true;
+    }
+
+    // 주민등록번호 유효성 알고리즘(체크섬) 포함
+    function validateRrn() {
+      const front = rrnFrontInput.value.trim();
+      const back = rrnBackInput.value.trim();
+      const patternFront = /^[0-9]{6}$/;
+      const patternBack = /^[0-9]{7}$/;
+
+      if (!patternFront.test(front) || !patternBack.test(back)) {
+        showError(errorRrn, '주민등록번호 앞 6자리, 뒤 7자리를 정확히 입력해주세요.');
+        setActiveStep(2);
+        return false;
+      }
+
+      const rrn = front + back;
+      if (rrn.length !== 13) {
+        showError(errorRrn, '유효하지 않은 주민등록번호입니다. 다시 확인해주세요.');
+        setActiveStep(2);
+        return false;
+      }
+
+      const digits = rrn.split('').map(d => parseInt(d, 10));
+      if (digits.some(d => Number.isNaN(d))) {
+        showError(errorRrn, '유효하지 않은 주민등록번호입니다. 다시 확인해주세요.');
+        setActiveStep(2);
+        return false;
+      }
+
+      const weights = [2,3,4,5,6,7,8,9,2,3,4,5];
+      let sum = 0;
+      for (let i = 0; i < 12; i++) {
+        sum += digits[i] * weights[i];
+      }
+      const check = (11 - (sum % 11)) % 10;
+
+      if (check !== digits[12]) {
+        showError(errorRrn, '유효하지 않은 주민등록번호입니다. 다시 확인해주세요.');
+        setActiveStep(2);
+        return false;
+      }
+
+      clearError(errorRrn);
+      return true;
+    }
+
+    // 은행별 계좌번호 패턴 검사
+    function validateAccount() {
+      const value = accountInput.value.trim();
+      const bank = bankSelect.value;
+
+      if (!bank) {
+        showError(errorAccount, '먼저 은행을 선택해주세요.');
+        setActiveStep(3);
+        return false;
+      }
+
+      if (!/^[0-9]+$/.test(value)) {
+        showError(errorAccount, '계좌번호는 숫자만 입력해주세요.');
+        setActiveStep(3);
+        return false;
+      }
+
+      let minLen = 8;
+      let maxLen = 14;
+
+      switch (bank) {
+        case '국민':
+        case '신한':
+        case '우리':
+        case '하나':
+          minLen = 10; maxLen = 14;
+          break;
+        case '농협':
+          minLen = 11; maxLen = 14;
+          break;
+        case '카카오뱅크':
+        case '토스뱅크':
+          minLen = 10; maxLen = 13;
+          break;
+        default:
+          minLen = 8; maxLen = 14;
+      }
+
+      if (value.length < minLen || value.length > maxLen) {
+        showError(
+          errorAccount,
+          bank + ' 계좌번호 길이가 올바르지 않습니다. (숫자 ' + minLen + ' ~ ' + maxLen + '자리)'
+        );
+        setActiveStep(3);
+        return false;
+      }
+
+      clearError(errorAccount);
+      return true;
+    }
+
+    function validateBank() {
+      if (!bankSelect.value) {
+        showError(errorBank, '은행을 선택해주세요.');
+        setActiveStep(3);
+        return false;
+      }
+      clearError(errorBank);
+      return true;
+    }
+
+    function updateSubmitState() {
+      const valid =
+        validateName() &&
+        validatePhone() &&
+        validateRrn() &&
+        validateBank() &&
+        validateAccount() &&
+        agreePrivacy.checked &&
+        agreeTelecom.checked;
+
+      submitBtn.disabled = !valid;
+    }
+
+    function syncAgreeAll() {
+      agreeAll.checked =
+        agreePrivacy.checked &&
+        agreeTelecom.checked &&
+        agreeMarketing.checked;
+    }
+
+    // 전체 동의 클릭 시 개별 동의 제어
+    agreeAll.addEventListener('change', () => {
+      const checked = agreeAll.checked;
+      agreePrivacy.checked = checked;
+      agreeTelecom.checked = checked;
+      agreeMarketing.checked = checked;
+      updateSubmitState();
+    });
+
+    [agreePrivacy, agreeTelecom, agreeMarketing].forEach(box => {
+      box.addEventListener('change', () => {
+        syncAgreeAll();
+        updateSubmitState();
+      });
+    });
+
+    // 입력 포커스/입력에 따라 단계 하이라이트 변경
+    [nameInput, phoneInput].forEach(input => {
+      input.addEventListener('focus', () => setActiveStep(1));
+      input.addEventListener('input', () => {
+        if (input === phoneInput) {
+          phoneInput.value = autoHyphenPhone(phoneInput.value);
+        }
+        updateSubmitState();
+      });
+    });
+
+    [rrnFrontInput, rrnBackInput].forEach(input => {
+      input.addEventListener('focus', () => setActiveStep(2));
+      input.addEventListener('input', () => {
+        updateSubmitState();
+      });
+    });
+
+    [bankSelect, accountInput].forEach(input => {
+      input.addEventListener('focus', () => setActiveStep(3));
+      input.addEventListener('input', () => {
+        updateSubmitState();
+      });
+      if (input.tagName && input.tagName.toLowerCase() === 'select') {
+        input.addEventListener('change', () => {
+          setActiveStep(3);
+          updateSubmitState();
+        });
+      }
+    });
+
+    function openPrivacyPolicy() {
+      alert('개인정보 처리방침 페이지로 이동합니다. (구현 필요)');
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      updateSubmitState();
+      if (submitBtn.disabled) {
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '전송 중…';
+      setActiveStep(3);
+
+      // TODO: 실제 전송 로직 구현 (HTTPS 환경, 본인인증/계좌인증 모듈 연동 등)
+      setTimeout(function () {
+        alert('인증 정보가 안전하게 전송되었습니다.\n상담원이 가입 진행을 도와드리겠습니다.');
+        submitBtn.textContent = '안전하게 전송하기';
+        form.reset();
+        [errorName, errorPhone, errorRrn, errorBank, errorAccount].forEach(clearError);
+        agreeAll.checked = false;
+        agreePrivacy.checked = false;
+        agreeTelecom.checked = false;
+        agreeMarketing.checked = false;
+        submitBtn.disabled = true;
+        setActiveStep(1);
+      }, 1200);
+    });
+  </script>
+</body>
+</html>

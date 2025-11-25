@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성지넷 - AI 프리미엄 견적서</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/quote.css">
+    <style>
+        /* [추가] 상세보기 모달 스타일 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 9999;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal-content {
+            background: white; width: 85%; max-width: 360px;
+            border-radius: 20px; padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-title { font-size: 18px; font-weight: 800; color: #333; }
+        .btn-close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; line-height: 1; }
+        
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #555; }
+        .detail-row.total { border-top: 2px solid #333; padding-top: 15px; margin-top: 15px; font-weight: 800; color: #333; font-size: 16px; align-items: center; }
+        .detail-row.discount { color: #dc3545; }
+        .detail-row.total .price { font-size: 20px; color: #007bff; }
+        
+        .btn-detail-view {
+            background: #fff; border: 1px solid #d1d5db; border-radius: 50px;
+            padding: 4px 10px; font-size: 11px; color: #555; cursor: pointer; 
+            margin-left: 6px; font-weight: 600; vertical-align: middle;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 3px;
+        }
+        .btn-detail-view:hover { background: #f3f4f6; color: #111; border-color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <!-- [섹션 1] 신뢰도 헤더 -->
+    <header class="trust-header">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">누적 개통</span>
+                <span class="stat-value" id="opening-count">216,883건</span>
+            </div>
+            <div class="stat-divider">|</div>
+            <div class="stat-item">
+                <span class="stat-label">고객 만족도</span>
+                <span class="stat-value star">★4.9</span>
+                <span class="stat-sub" id="review-count">(26,577건)</span>
+            </div>
+        </div>
+        <div class="manager-profile">
+            <div class="manager-img-box">
+                <img src="assets/images/manager_placeholder.png" alt="매니저" id="manager-img">
+                <span class="team-badge" id="manager-team">솔루션제안팀</span>
+            </div>
+            <div class="manager-info">
+                <span class="manager-name" id="manager-name">홍연주</span>
+                <span class="manager-role" id="manager-role">MANAGER</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="quote-date-bar">
+        견적일: <span id="current-time"></span>
+    </div>
+
+    <main class="quote-container">
+        <!-- [섹션 2] AI 분석 결과 -->
+        <section class="ai-result-card">
+            <div class="ai-badge">AI Smart Planner Analysis</div>
+            <h1 class="greeting"><span id="customer-name">고객</span>님을 위한<br>최적의 플랜입니다.</h1>
+            
+            <div class="plan-summary">
+                <div class="plan-row carrier-row">
+                    <span class="label">통신사</span>
+                    <span class="value highlight" id="plan-carrier">LG U+</span>
+                </div>
+                <div class="plan-row product-row">
+                    <span class="label">상품구성</span>
+                    <div class="product-value-box">
+                        <span class="value" id="plan-product">1G 인터넷 + 프리미엄 TV</span>
+                        <button id="btn-open-detail" class="btn-detail-view">상세보기 <i class="fas fa-chevron-right" style="font-size: 9px;"></i></button>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="plan-row price-row">
+                    <span class="label">월 예상 납부액</span>
+                    <div class="price-box">
+                        <span class="original-price" id="original-price">55,000원</span>
+                        <span class="final-price" id="final-price">38,500원</span>
+                    </div>
+                </div>
+                <div class="saving-badge">
+                    3년 약정 시 총 <span id="total-saving">60만원</span> 절약 예상!
+                </div>
+            </div>
+        </section>
+
+        <!-- [섹션 3] 혜택 언박싱 -->
+        <section class="benefit-section">
+            <h2 class="section-title">🎁 지원금 혜택 내역</h2>
+            
+            <div class="benefit-card open">
+                <div class="benefit-icon">💰</div>
+                <div class="benefit-info">
+                    <span class="benefit-name">기본 현금 사은품</span>
+                    <span class="benefit-amount" id="base-gift">470,000원</span>
+                </div>
+            </div>
+
+            <div class="benefit-card secret" id="secret-card">
+                <div class="secret-overlay">
+                    <i class="fas fa-lock"></i>
+                    <span>터치해서 비밀혜택 확인하기</span>
+                </div>
+                <div class="benefit-content-blur">
+                    <div class="benefit-icon">🤫</div>
+                    <div class="benefit-info">
+                        <span class="benefit-name">시크릿 추가 지원금</span>
+                        <span class="benefit-amount highlight">+ <span id="secret-gift">30,000원</span></span>
+                    </div>
+                    <p class="secret-desc">※ 본 혜택은 위 링크를 통해 접수 시에만 적용됩니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- [섹션 4] 필수 안내사항 -->
+        <section class="notice-section">
+            <h3><span class="bar">|</span> 필수 안내사항</h3>
+            <ul class="notice-list">
+                <li>상기 조건은 견적 당일 접수기준 유효하며, 이월시 변경 될 수 있습니다.</li>
+                <li>가입요금제 최소 9개월 유지조건(3년약정)을 준수해야 합니다.</li>
+                <li>12개월 이내 해지 시 지원금 전액 환수 및 위약금이 발생합니다.</li>
+                <li>당사는 사전승낙등록업체 및 통신판매등록업체입니다.</li>
+                <li>21년간 쌓아온 신뢰와 노하우로 고객만족을 위해 항상 최선을 다하겠습니다.</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- [수정] 푸터 버튼 3개로 변경 -->
+    <footer class="floating-footer">
+        <a href="https://pf.kakao.com/_pqxnxmT" target="_blank" class="btn-footer btn-kakao">
+            <i class="fas fa-comment"></i> 카톡 문의
+        </a>
+        <a href="tel:1644-6780" class="btn-footer btn-call">
+            <i class="fas fa-phone-alt"></i> 전화 상담
+        </a>
+        <button id="btn-apply" class="btn-footer btn-apply">
+            <i class="fas fa-rocket"></i> 가입하기
+        </button>
+    </footer>
+
+    <!-- [추가] 상세 내역 모달 -->
+    <div class="modal-overlay" id="quote-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">월 요금 상세 내역</span>
+                <button class="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span>기본 요금 (인터넷+TV)</span>
+                    <span id="modal-original-price">0원</span>
+                </div>
+                <div class="detail-row discount">
+                    <span>요금 할인 (약정/결합)</span>
+                    <span id="modal-discount-price">-0원</span>
+                </div>
+                <div class="detail-row total">
+                    <span>최종 납부 금액</span>
+                    <span id="modal-final-price" class="price">0원</span>
+                </div>
+                <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-top:20px; font-size:12px; color:#666; line-height:1.6;">
+                    <strong style="display:block; margin-bottom:5px; color:#333;">※ 안내사항</strong>
+                    • 3년 약정 기준이며, 부가세(VAT)가 포함된 실제 납부 금액입니다.<br>
+                    • 제휴카드 할인 미포함 금액입니다.<br>
+                    • 설치비는 첫 달에만 1회 청구됩니다.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/quote.js"></script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성지넷 - 셀프 가입 신청</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+
+    <div class="form-wrapper">
+        <ol class="progress-bar">
+            <li class="step"><div class="icon">1</div><div class="text">상품신청</div></li>
+            <li class="step"><div class="icon">2</div><div class="text">정보입력</div></li>
+            <li class="step"><div class="icon">3</div><div class="text">사은품</div></li>
+            <li class="step"><div class="icon">4</div><div class="text">납부방법</div></li>
+            <li class="step"><div class="icon">5</div><div class="text">약관동의</div></li>
+        </ol>
+
+        <form id="signup-form">
+            <!-- URL로 전달된 상품 정보를 저장할 숨겨진 필드 -->
+            <input type="hidden" id="selected-product-telecom" name="selectedTelecom">
+            <input type="hidden" id="selected-product-internet" name="selectedInternet">
+            <input type="hidden" id="selected-product-tv" name="selectedTv">
+            <input type="hidden" id="selected-product-settop" name="selectedSettop">
+            <input type="hidden" id="selected-product-additionalTv" name="selectedAdditionalTv">
+            <input type="hidden" id="selected-product-combined" name="selectedCombinedProduct">
+            <input type="hidden" id="selected-product-totalPrice" name="selectedTotalPrice">
+            <input type="hidden" id="selected-product-supportFund" name="selectedSupportFund">
+            <input type="hidden" id="selected-product-usim" name="selectedUsim">
+            
+            <!-- 단계 1: 상품 신청 -->
+            <div class="form-section">
+                <h2 class="section-title">상품 신청서</h2>
+                <div class="product-summary" id="product-summary-container">
+                    <!-- JS가 여기에 상품 정보를 채웁니다. -->
+                </div>
+                <div class="form-group" style="margin-top: 30px;">
+                    <div class="choice-box active">신청자 본인입니다.<div class="check-icon">✔</div></div>
+                </div>
+                <div class="form-group">
+                    <div class="choice-box">가족, 사업자, 외국인 중에 해당됩니다.<div class="check-icon">✔</div></div>
+                </div>
+            </div>
+
+            <!-- 단계 2: 정보 입력 -->
+            <div class="form-section">
+                <h2 class="section-title">가입자 정보를 입력해주세요</h2>
+                <h3 class="sub-title" style="border:none; margin-top:0;">가입자 정보</h3>
+                <div class="form-group">
+                    <label class="label">고객 구분<span class="required">*</span></label>
+                    <div class="radio-group-container">
+                        <div><input type="radio" id="type-personal" name="customerType" value="개인" class="radio-input" checked><label for="type-personal" class="radio-label">개인</label></div>
+                        <div><input type="radio" id="type-individual-biz" name="customerType" value="개인사업자" class="radio-input"><label for="type-individual-biz" class="radio-label">개인사업자</label></div>
+                        <div><input type="radio" id="type-corporate-biz" name="customerType" value="법인사업자" class="radio-input"><label for="type-corporate-biz" class="radio-label">법인사업자</label></div>
+                        <div><input type="radio" id="type-foreigner" name="customerType" value="외국인" class="radio-input"><label for="type-foreigner" class="radio-label">외국인</label></div>
+                    </div>
+                    <p class="helper-text">사업장 또는 소호 신청인 경우 개인사업자를 선택해주세요.</p>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group" id="corporate-name-section" style="display: none;">
+                    <label for="corporateName">법인명<span class="required">*</span></label>
+                    <input type="text" id="corporateName" name="corporateName" class="form-control">
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group" id="biz-name-section" style="display: none;">
+                    <label for="bizName">상호명<span class="required">*</span></label>
+                    <input type="text" id="bizName" name="bizName" class="form-control">
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group" id="person-name-section">
+                    <label for="name" id="name-label">가입자명<span class="required">*</span></label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group" id="biz-reg-number-section" style="display: none;">
+                    <label for="bizRegNumber">사업자등록번호<span class="required">*</span></label>
+                    <input type="text" id="bizRegNumber" name="bizRegNumber" class="form-control" placeholder="'-'없이 10자리 숫자만 입력" maxlength="10">
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group" id="birth-section">
+                    <label for="birth">생년월일<span class="required">*</span></label>
+                    <input type="text" id="birth" name="birth" class="form-control" placeholder="예: 19760612" maxlength="8" required>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group">
+                    <label class="label">성별<span class="required">*</span></label>
+                    <div class="radio-group-container">
+                        <div><input type="radio" id="gender-male" name="gender" value="남성" class="radio-input" checked><label for="gender-male" class="radio-label">남성</label></div>
+                        <div><input type="radio" id="gender-female" name="gender" value="여성" class="radio-input"><label for="gender-female" class="radio-label">여성</label></div>
+                    </div>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">가입자 명의 연락처<span class="required">*</span></label>
+                    <div class="input-with-select">
+                        <input type="tel" id="phone" name="phone" class="form-control" placeholder="'-'없이 입력" required>
+                        <select name="carrier" class="form-control" required><option value="SKT">SKT</option><option value="KT">KT</option><option value="LG">LG U+</option><option value="알뜰폰">알뜰폰</option></select>
+                    </div>
+                    <button type="button" class="btn-add-contact">+ 비상 연락처 추가</button>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일<span class="required">*</span></label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group">
+                    <label>설치주소<span class="required">*</span></label>
+                    <div class="input-with-button">
+                        <button type="button" class="btn-gray" onclick="openDaumPostcode()">주소찾기</button>
+                        <input type="text" id="address-basic" name="address_basic" class="form-control" placeholder="주소" readonly required>
+                    </div>
+                    <input type="text" id="address-detail" name="address_detail" class="form-control" placeholder="상세 주소 입력" style="margin-top: 10px;" required>
+                    <div class="validation-message"></div>
+                </div>
+            </div>
+            
+            <!-- 단계 3: 사은품 -->
+            <div class="form-section">
+                <h2 class="section-title">사은품 받는 분 정보를 알려주세요</h2>
+                <div class="form-group">
+                    <label for="bank">계좌정보<span class="required">*</span></label>
+                    <select id="bank" name="bank" class="form-control" required>
+                        <option value="">은행 선택</option><option value="KB국민은행">KB국민은행</option><option value="신한은행">신한은행</option><option value="우리은행">우리은행</option><option value="하나은행">하나은행</option><option value="IBK기업은행">IBK기업은행</option><option value="NH농협은행">NH농협은행</option><option value="KDB산업은행">KDB산업은행</option><option value="SC제일은행">SC제일은행</option><option value="씨티은행">씨티은행</option><option value="수협은행">수협은행</option><option value="카카오뱅크">카카오뱅크</option><option value="케이뱅크">케이뱅크</option><option value="토스뱅크">토스뱅크</option><option value="경남은행">경남은행</option><option value="광주은행">광주은행</option><option value="대구은행">대구은행</option><option value="부산은행">부산은행</option><option value="전북은행">전북은행</option><option value="제주은행">제주은행</option><option value="새마을금고">새마을금고</option><option value="신용협동조합">신용협동조합</option><option value="저축은행">저축은행</option><option value="우체국">우체국</option>
+                    </select>
+                    <input type="text" class="form-control" id="giftAccountNumber" name="accountNumber" style="margin-top:10px;" placeholder="계좌번호 입력 ('-'없이 숫자만)" required>
+                    <div class="validation-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="giftcard">상품권 선택</label>
+                    <select id="giftcard" name="giftcard" class="form-control">
+                        <option value="이마트 상품권">이마트 상품권</option><option value="홈플러스 상품권">홈플러스 상품권</option>
+                        <option value="롯데상품권">롯데상품권</option><option value="농협상품권">농협상품권</option><option value="기타">기타</option>
+                    </select>
+                    <div class="validation-message"></div>
+                </div>
+            </div>
+
+            <!-- 단계 4: 납부방법 -->
+            <div class="form-section">
+                 <h2 class="section-title">납부 방법을 알려주세요</h2>
+                 <div class="form-group">
+                    <label for="paymentMethod">납부 방법<span class="required">*</span></label>
+                    <select id="paymentMethod" name="paymentMethod" class="form-control" required><option value="">납부 방법을 선택해주세요</option><option value="계좌이체">계좌이체</option><option value="카드납부">카드납부</option></select>
+                    <div class="validation-message"></div>
+                </div>
+                <div id="payer-info-section" style="display: none;">
+                    <h3 class="sub-title">계좌 정보 입력</h3>
+                    <div class="form-group"><label for="payerName">납부자명<span class="required">*</span></label><input type="text" id="payerName" name="payerName" class="form-control"><div class="validation-message"></div></div>
+                    <div class="form-group">
+                        <label for="payerBank">은행명<span class="required">*</span></label>
+                        <select id="payerBank" name="payerBank" class="form-control">
+                             <option value="">은행 선택</option><option value="KB국민은행">KB국민은행</option><option value="신한은행">신한은행</option><option value="우리은행">우리은행</option><option value="하나은행">하나은행</option><option value="IBK기업은행">IBK기업은행</option><option value="NH농협은행">NH농협은행</option><option value="KDB산업은행">KDB산업은행</option><option value="SC제일은행">SC제일은행</option><option value="씨티은행">씨티은행</option><option value="수협은행">수협은행</option><option value="카카오뱅크">카카오뱅크</option><option value="케이뱅크">케이뱅크</option><option value="토스뱅크">토스뱅크</option><option value="경남은행">경남은행</option><option value="광주은행">광주은행</option><option value="대구은행">대구은행</option><option value="부산은행">부산은행</option><option value="전북은행">전북은행</option><option value="제주은행">제주은행</option><option value="새마을금고">새마을금고</option><option value="신용협동조합">신용협동조합</option><option value="저축은행">저축은행</option><option value="우체국">우체국</option>
+                        </select>
+                        <div class="validation-message"></div>
+                    </div>
+                    <div class="form-group"><label for="payerAccountNumber">계좌번호<span class="required">*</span></label><input type="text" id="payerAccountNumber" name="payerAccountNumber" class="form-control" placeholder="'-'없이 숫자만 입력"><div class="validation-message"></div></div>
+                </div>
+                <div id="card-info-section" style="display: none;">
+                    <h3 class="sub-title">카드 정보 입력</h3>
+                     <div class="form-group"><label for="cardHolderName">카드주명<span class="required">*</span></label><input type="text" id="cardHolderName" name="cardHolderName" class="form-control"><div class="validation-message"></div></div>
+                    <div class="form-group">
+                        <label for="payerCardCompany">카드사<span class="required">*</span></label>
+                        <select id="payerCardCompany" name="payerCardCompany" class="form-control">
+                            <option value="">카드사 선택</option><option value="현대카드">현대카드</option><option value="삼성카드">삼성카드</option><option value="신한카드">신한카드</option><option value="KB국민카드">KB국민카드</option><option value="롯데카드">롯데카드</option><option value="우리카드">우리카드</option><option value="하나카드">하나카드</option><option value="BC카드">BC카드</option><option value="NH농협카드">NH농협카드</option><option value="씨티카드">씨티카드</option><option value="카카오뱅크카드">카카오뱅크카드</option>
+                        </select>
+                        <div class="validation-message"></div>
+                    </div>
+                    <div class="form-group"><label for="payerCardNumber">카드번호<span class="required">*</span></label><input type="text" id="payerCardNumber" name="payerCardNumber" class="form-control" placeholder="'-'없이 숫자만 입력" maxlength="19"><div class="validation-message"></div></div>
+                    <div class="form-group">
+                        <label for="payerCardExpiryMonth">유효기간<span class="required">*</span></label>
+                        <div class="input-group-flex">
+                            <select id="payerCardExpiryMonth" name="payerCardExpiryMonth" class="form-control" required>
+                                <option value="">월</option>
+                            </select>
+                            <select id="payerCardExpiryYear" name="payerCardExpiryYear" class="form-control" required>
+                                <option value="">년</option>
+                            </select>
+                        </div>
+                        <div class="validation-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 단계 5: 약관동의 -->
+            <div class="form-section">
+                <h2 class="section-title">필독사항과 약관을 확인해주세요</h2>
+                <div class="terms-box">
+                    <div class="terms-all">
+                        <input type="checkbox" id="agree-all" name="agreeAll" style="margin-right: 10px;">
+                        <label for="agree-all">전체 동의합니다.</label>
+                    </div>
+                    <ul class="terms-list">
+                        <li class="terms-item">
+                             <div class="terms-item-line">
+                                <input type="checkbox" id="agree-1" name="agree1" class="terms-checkbox-item" required>
+                                <label for="agree-1">(필수) 개인정보 수집 및 이용 동의</label>
+                                <a href="#" class="terms-toggle-arrow" data-term="term1">&gt;</a>
+                            </div>
+                        </li>
+                        <li class="terms-item">
+                            <div class="terms-item-line">
+                                <input type="checkbox" id="agree-2" name="agree2" class="terms-checkbox-item" required>
+                                <label for="agree-2">(필수) 개인정보 제3자 제공 동의</label>
+                                <a href="#" class="terms-toggle-arrow" data-term="term2">&gt;</a>
+                            </div>
+                        </li>
+                        <li class="terms-item">
+                             <div class="terms-item-line">
+                                <input type="checkbox" id="agree-3" name="agree3" class="terms-checkbox-item">
+                                <label for="agree-3">(선택) 마케팅 정보 수신 동의</label>
+                                <a href="#" class="terms-toggle-arrow" data-term="term3">&gt;</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form-group" style="margin-top:20px;">
+                    <label for="requests">고객 요청사항</label>
+                    <textarea id="requests" name="requests" class="form-control" rows="4" placeholder="요청사항을 입력해주세요"></textarea>
+                    <div class="validation-message"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="sticky-footer">
+        <div class="footer-content">
+            <div class="price-summary"><div class="label">월요금 <span style="font-size:12px;">(VAT포함)</span></div><div class="amount" id="summary-price">0원</div><div class="amount gift" id="summary-gift">사은품 0원</div></div>
+            <div class="nav-buttons"><button type="button" class="nav-btn btn-prev" style="display: none;">이전 단계로</button><button type="button" class="nav-btn btn-next">다음</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="confirm-modal"><div class="modal-content"><h3>알림</h3><p>납부자와 납부방법이 가입자와 동일합니까?</p><div class="modal-buttons"><button class="nav-btn btn-prev" id="modal-no">아니요</button><button class="nav-btn btn-next" id="modal-yes">예, 동일합니다</button></div></div></div>
+    <div class="modal-overlay" id="terms-detail-modal"><div class="modal-content large"><h3 id="terms-modal-title"></h3><div id="terms-modal-body" class="modal-body"></div><div class="modal-buttons"><button class="nav-btn btn-next" id="terms-modal-close">확인</button></div></div></div>
+
+    <script src="js/signup.js" defer></script>
+</body>
+</html>
